@@ -149,11 +149,6 @@
                                         Command="{Binding ProfileCommand}">
                                     <TextBlock Text="• Tài khoản"/>
                                 </Button>
-
-                                <Button Style="{StaticResource SidebarButtonStyle}"
-                                        Command="{Binding ChangePasswordCommand}">
-                                    <TextBlock Text="• Đổi mật khẩu"/>
-                                </Button>
                             </StackPanel>
                         </Expander>
                     </StackPanel>

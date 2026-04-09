@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Cau2.ViewModels
+namespace Coffee_Tee.ViewModels
 {
     public class RelayCommand : ICommand
     {

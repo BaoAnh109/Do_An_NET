@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cau2.ViewModels
+namespace Coffee_Tee.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {

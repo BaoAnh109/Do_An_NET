@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Coffee_Tee.ViewModels;
 
 namespace Coffee_Tee.Views
 {
@@ -22,6 +23,7 @@ namespace Coffee_Tee.Views
         public MainView()
         {
             InitializeComponent();
+            DataContext = new MainViewModel();
         }
     }
 }
