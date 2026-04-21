@@ -39,6 +39,7 @@ namespace Coffee_Tee.ViewModels
             _importCommand = new RelayCommand(delegate { CurrentView = new UCImportReceipt(); });
             _inventoryCommand = new RelayCommand(delegate { CurrentView = new UCInventory(); });
             _revenueReportCommand = new RelayCommand(delegate { CurrentView = new UCStoreStatistics(); });
+            _profileCommand = new RelayCommand(delegate { CurrentView = new UCProfile(); });
             _logoutCommand = new RelayCommand(delegate { CurrentView = null; });
 
             CurrentView = new UCDashboardView();
