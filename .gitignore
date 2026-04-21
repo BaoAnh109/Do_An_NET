@@ -24,3 +24,7 @@ x86/
 # Test output
 TestResults/
 *.trx
+
+#SKILL
+
+SKILL/
