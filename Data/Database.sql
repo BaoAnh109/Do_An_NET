@@ -1,5 +1,5 @@
 ﻿-- =============================================
---  CSDL QUAN LY COFFEE & TEA
+--  CSDL QUAN LY CoffeeTea
 --  Muc tieu: de hoc, de dung, du chuc nang repo
 --  He QTCSDL: SQL Server
 -- =============================================
