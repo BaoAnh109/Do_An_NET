@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using CoffeeTea.Models;
 using CoffeeTea.Views;
 
 namespace CoffeeTea.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
+        private readonly NhanVien _authenticatedUser;
+        private readonly Action _logoutAction;
+
         private object _currentView;
         private ICommand _dashboardCommand;
         private ICommand _drinkCommand;
@@ -23,27 +23,51 @@ namespace CoffeeTea.ViewModels
         private ICommand _inventoryCommand;
         private ICommand _revenueReportCommand;
         private ICommand _profileCommand;
-        private ICommand _changePasswordCommand;
+        private ICommand _settingsCommand;
         private ICommand _logoutCommand;
 
-        public MainViewModel()
+        public MainViewModel(NhanVien authenticatedUser, Action logoutAction)
         {
-            _dashboardCommand = new RelayCommand(delegate { CurrentView = new UCDashboardView(); });
-            _drinkCommand = new RelayCommand(delegate { CurrentView = new UCDrinkManagement(); });
-            _categoryCommand = new RelayCommand(delegate { CurrentView = new UCCategoryManagement(); });
-            _staffCommand = new RelayCommand(delegate { CurrentView = new UCStaffManagement(); });
-            _supplierCommand = new RelayCommand(delegate { CurrentView = new UCSupplierManagement(); });
-            _orderCommand = new RelayCommand(delegate { CurrentView = new UCOrder(); });
-            _paymentCommand = new RelayCommand(delegate { CurrentView = new UCPayment(); });
-            _tableStatusCommand = new RelayCommand(delegate { CurrentView = new UCTableStatus(); });
-            _importCommand = new RelayCommand(delegate { CurrentView = new UCImportReceipt(); });
-            _inventoryCommand = new RelayCommand(delegate { CurrentView = new UCInventory(); });
-            _revenueReportCommand = new RelayCommand(delegate { CurrentView = new UCStoreStatistics(); });
-            _profileCommand = new RelayCommand(delegate { CurrentView = new UCProfile(); });
-            _logoutCommand = new RelayCommand(delegate { CurrentView = null; });
+            _authenticatedUser = authenticatedUser;
+            _logoutAction = logoutAction;
 
-            CurrentView = new UCDashboardView();
+            CurrentAccountName = ResolveAccountName();
+            CurrentAccountRole = ResolveRoleDisplay();
+            BuildPermissionSet();
+
+            _dashboardCommand = new RelayCommand(_ => CurrentView = new UCDashboardView(_authenticatedUser), _ => CanAccessSalesMenu);
+            _drinkCommand = new RelayCommand(_ => CurrentView = new UCDrinkManagement(), _ => CanAccessCatalogMenu);
+            _categoryCommand = new RelayCommand(_ => CurrentView = new UCCategoryManagement(), _ => CanAccessCatalogMenu);
+            _staffCommand = new RelayCommand(_ => CurrentView = new UCStaffManagement(), _ => CanAccessCatalogMenu);
+            _supplierCommand = new RelayCommand(_ => CurrentView = new UCSupplierManagement(), _ => CanAccessCatalogMenu);
+            _orderCommand = new RelayCommand(_ => CurrentView = new UCOrder(), _ => CanAccessSalesMenu);
+            _paymentCommand = new RelayCommand(_ => CurrentView = new UCPayment(), _ => CanAccessSalesMenu);
+            _tableStatusCommand = new RelayCommand(_ => CurrentView = new UCTableStatus(), _ => CanAccessSalesMenu);
+            _importCommand = new RelayCommand(_ => CurrentView = new UCImportReceipt(), _ => CanAccessWarehouseMenu);
+            _inventoryCommand = new RelayCommand(_ => CurrentView = new UCInventory(), _ => CanAccessWarehouseMenu);
+            _revenueReportCommand = new RelayCommand(_ => CurrentView = new UCStoreStatistics(), _ => CanAccessStatisticsMenu);
+            _profileCommand = new RelayCommand(_ => CurrentView = new UCProfile(_authenticatedUser), _ => CanAccessSystemMenu);
+            _settingsCommand = new RelayCommand(_ => CurrentView = new UCSettings(_authenticatedUser), _ => CanAccessSettings);
+            _logoutCommand = new RelayCommand(_ => _logoutAction?.Invoke());
+
+            CurrentView = new UCDashboardView(_authenticatedUser);
         }
+
+        public string CurrentAccountName { get; private set; }
+
+        public string CurrentAccountRole { get; private set; }
+
+        public bool CanAccessCatalogMenu { get; private set; }
+
+        public bool CanAccessSalesMenu { get; private set; }
+
+        public bool CanAccessWarehouseMenu { get; private set; }
+
+        public bool CanAccessStatisticsMenu { get; private set; }
+
+        public bool CanAccessSystemMenu { get; private set; }
+
+        public bool CanAccessSettings { get; private set; }
 
         public object CurrentView
         {
@@ -61,6 +85,11 @@ namespace CoffeeTea.ViewModels
                 _currentView = value;
                 OnPropertyChanged(nameof(CurrentView));
             }
+        }
+
+        public NhanVien AuthenticatedUser
+        {
+            get { return _authenticatedUser; }
         }
 
         public ICommand DashboardCommand
@@ -123,14 +152,66 @@ namespace CoffeeTea.ViewModels
             get { return _profileCommand; }
         }
 
-        public ICommand ChangePasswordCommand
+        public ICommand SettingsCommand
         {
-            get { return _changePasswordCommand; }
+            get { return _settingsCommand; }
         }
 
         public ICommand LogoutCommand
         {
             get { return _logoutCommand; }
+        }
+
+        private string ResolveAccountName()
+        {
+            if (_authenticatedUser == null || string.IsNullOrWhiteSpace(_authenticatedUser.HoTen))
+            {
+                return "Tài khoản không xác định";
+            }
+
+            return _authenticatedUser.HoTen.Trim();
+        }
+
+        private string ResolveRoleDisplay()
+        {
+            string roleName = _authenticatedUser?.VaiTro != null ? _authenticatedUser.VaiTro.TenVaiTro : null;
+            string roleCode = _authenticatedUser != null ? _authenticatedUser.MaVaiTro : null;
+
+            if (!string.IsNullOrWhiteSpace(roleName))
+            {
+                return roleName.Trim();
+            }
+
+            if (string.Equals(roleCode, "VT01", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Admin";
+            }
+
+            if (string.Equals(roleCode, "VT02", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Quản lý";
+            }
+
+            if (string.Equals(roleCode, "VT03", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Nhân viên";
+            }
+
+            return "Không xác định";
+        }
+
+        private void BuildPermissionSet()
+        {
+            bool isAdmin = string.Equals(_authenticatedUser?.MaVaiTro, "VT01", StringComparison.OrdinalIgnoreCase);
+            bool isManager = string.Equals(_authenticatedUser?.MaVaiTro, "VT02", StringComparison.OrdinalIgnoreCase);
+            bool isStaff = string.Equals(_authenticatedUser?.MaVaiTro, "VT03", StringComparison.OrdinalIgnoreCase);
+
+            CanAccessCatalogMenu = isAdmin || isManager;
+            CanAccessSalesMenu = true;
+            CanAccessWarehouseMenu = isAdmin || isManager || isStaff;
+            CanAccessStatisticsMenu = isAdmin || isManager;
+            CanAccessSystemMenu = true;
+            CanAccessSettings = isAdmin || isManager;
         }
     }
 }

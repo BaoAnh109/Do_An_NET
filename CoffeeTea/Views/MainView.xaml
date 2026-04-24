@@ -3,28 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CoffeeTea.Views"
         mc:Ignorable="d"
-        Title="Coffee Tea Management"
+        Title="Quản lý CoffeeTea"
         Height="760"
         Width="1366"
         MinHeight="700"
         MinWidth="1200"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
-        Background="{StaticResource Brush.WindowBackground}">
-    <Grid Background="{StaticResource Brush.WindowBackground}">
+        Background="{DynamicResource Brush.WindowBackground}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid Background="{DynamicResource Brush.WindowBackground}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- =======================================================
-             SIDEBAR
-             ======================================================= -->
         <Border Grid.Column="0"
-                Background="{StaticResource Brush.Sidebar}"
-                BorderBrush="{StaticResource Brush.BorderSoft}"
+                Background="{DynamicResource Brush.Sidebar}"
+                BorderBrush="{DynamicResource Brush.BorderSoft}"
                 BorderThickness="0,0,1,0">
             <Grid Margin="18">
                 <Grid.RowDefinitions>
@@ -35,25 +35,37 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Brand -->
-                <Border Grid.Row="0"
-                        Style="{StaticResource HighlightCardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Cửa hàng"
-                                   Style="{StaticResource CaptionTextStyle}"
-                                   Margin="0,6,0,0"/>
-                        <TextBlock Text="☕ CoffeeTea"
-                                   Style="{StaticResource TitleTextStyle}"
-                                   FontSize="24"/>
-                    </StackPanel>
-                </Border>
+                <StackPanel Grid.Row="0">
+                    <Border Style="{StaticResource HighlightCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Cửa hàng"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       Margin="0,6,0,0"/>
+                            <TextBlock Text="CoffeeTea"
+                                       Style="{StaticResource TitleTextStyle}"
+                                       FontSize="24"/>
+                        </StackPanel>
+                    </Border>
 
-                <!-- Menu -->
+                    <Border Style="{StaticResource SidebarCardStyle}" Margin="0,12,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Tài khoản đăng nhập"
+                                       Style="{StaticResource CaptionTextStyle}"/>
+                            <TextBlock Text="{Binding CurrentAccountName}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       FontWeight="SemiBold"
+                                       Margin="0,4,0,0"/>
+                            <TextBlock Text="{Binding CurrentAccountRole}"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
                 <ScrollViewer Grid.Row="2"
                               VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                     <StackPanel>
-
                         <TextBlock Text="MENU CHỨC NĂNG"
                                    Style="{StaticResource CaptionTextStyle}"
                                    FontWeight="Bold"
@@ -69,7 +81,8 @@
 
                         <Expander Header="Danh mục"
                                   IsExpanded="True"
-                                  Style="{StaticResource SidebarExpanderStyle}">
+                                  Style="{StaticResource SidebarExpanderStyle}"
+                                  Visibility="{Binding CanAccessCatalogMenu, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Margin="8,8,0,0">
                                 <Button Style="{StaticResource SidebarButtonStyle}"
                                         Command="{Binding DrinkCommand}">
@@ -95,7 +108,8 @@
 
                         <Expander Header="Bán hàng"
                                   IsExpanded="True"
-                                  Style="{StaticResource SidebarExpanderStyle}">
+                                  Style="{StaticResource SidebarExpanderStyle}"
+                                  Visibility="{Binding CanAccessSalesMenu, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Margin="8,8,0,0">
                                 <Button Style="{StaticResource SidebarButtonStyle}"
                                         Command="{Binding OrderCommand}">
@@ -116,7 +130,8 @@
 
                         <Expander Header="Kho hàng"
                                   IsExpanded="False"
-                                  Style="{StaticResource SidebarExpanderStyle}">
+                                  Style="{StaticResource SidebarExpanderStyle}"
+                                  Visibility="{Binding CanAccessWarehouseMenu, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Margin="8,8,0,0">
                                 <Button Style="{StaticResource SidebarButtonStyle}"
                                         Command="{Binding ImportCommand}">
@@ -132,7 +147,8 @@
 
                         <Expander Header="Thống kê"
                                   IsExpanded="False"
-                                  Style="{StaticResource SidebarExpanderStyle}">
+                                  Style="{StaticResource SidebarExpanderStyle}"
+                                  Visibility="{Binding CanAccessStatisticsMenu, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Margin="8,8,0,0">
                                 <Button Style="{StaticResource SidebarButtonStyle}"
                                         Command="{Binding RevenueReportCommand}">
@@ -143,37 +159,40 @@
 
                         <Expander Header="Hệ thống"
                                   IsExpanded="False"
-                                  Style="{StaticResource SidebarExpanderStyle}">
+                                  Style="{StaticResource SidebarExpanderStyle}"
+                                  Visibility="{Binding CanAccessSystemMenu, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Margin="8,8,0,0">
                                 <Button Style="{StaticResource SidebarButtonStyle}"
                                         Command="{Binding ProfileCommand}">
-                                    <TextBlock Text="• Tài khoản"/>
+                                    <TextBlock Text="• Tài khoản và đổi mật khẩu"/>
+                                </Button>
+
+                                <Button Style="{StaticResource SidebarButtonStyle}"
+                                        Command="{Binding SettingsCommand}"
+                                        Visibility="{Binding CanAccessSettings, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock Text="• Cài đặt hệ thống"/>
                                 </Button>
                             </StackPanel>
                         </Expander>
                     </StackPanel>
                 </ScrollViewer>
-                <!-- Footer sidebar -->
+
                 <StackPanel Grid.Row="4">
                     <Button Style="{StaticResource BaseButtonStyle}"
-                    Command="{Binding LogoutCommand}">
-                        <TextBlock Text="↩ Đăng xuất"/>
+                            Command="{Binding LogoutCommand}">
+                        <TextBlock Text="Đăng xuất"/>
                     </Button>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- =======================================================
-             MAIN CONTENT
-             ======================================================= -->
         <Grid Grid.Column="1">
-            <ContentControl Content="{Binding CurrentView}"
-                                    Margin="16"/>
+            <ContentControl Content="{Binding CurrentView}" Margin="16"/>
 
             <TextBlock Text="Chọn một chức năng ở menu bên trái để bắt đầu thao tác"
-                               FontStyle="Italic"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center">
+                       FontStyle="Italic"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource BodyTextStyle}">
                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -188,5 +207,4 @@
         </Grid>
     </Grid>
 </Window>
-
 
