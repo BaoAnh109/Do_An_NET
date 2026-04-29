@@ -211,7 +211,7 @@ namespace CoffeeTea.ViewModels
             CanAccessWarehouseMenu = isAdmin || isManager || isStaff;
             CanAccessStatisticsMenu = isAdmin || isManager;
             CanAccessSystemMenu = true;
-            CanAccessSettings = isAdmin || isManager;
+            CanAccessSettings = true;
         }
     }
 }

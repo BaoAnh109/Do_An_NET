@@ -45,6 +45,37 @@ namespace CoffeeTea.ViewModels
 
         public ICommand BackupSettingsCommand { get; private set; }
 
+        public bool CanEditSystemSettings
+        {
+            get { return IsSystemSettingsEditor(); }
+        }
+
+        public bool CanEditAppearanceSettings
+        {
+            get { return true; }
+        }
+
+        public string PermissionSummary
+        {
+            get
+            {
+                if (CanEditSystemSettings)
+                {
+                    return "Bạn có quyền chỉnh thông tin cửa hàng, vận hành hệ thống, giao diện và sao lưu cấu hình.";
+                }
+
+                return "Tài khoản nhân viên chỉ được chỉnh cài đặt giao diện của ứng dụng.";
+            }
+        }
+
+        public string RestoreDefaultsButtonText
+        {
+            get
+            {
+                return CanEditSystemSettings ? "Khôi phục mặc định" : "Khôi phục giao diện";
+            }
+        }
+
         public string StoreDisplayName
         {
             get { return _storeDisplayName; }
@@ -282,6 +313,18 @@ namespace CoffeeTea.ViewModels
         {
             ClearStatus();
 
+            if (CanEditSystemSettings)
+            {
+                SaveSystemSettings();
+            }
+            else
+            {
+                SaveAppearanceSettings();
+            }
+        }
+
+        private void SaveSystemSettings()
+        {
             if (!ValidateInput())
             {
                 return;
@@ -304,21 +347,40 @@ namespace CoffeeTea.ViewModels
             }
         }
 
+        private void SaveAppearanceSettings()
+        {
+            try
+            {
+                SoftwareSettingsModel settings = _settingsStorageService.Load();
+                settings.IsDarkTheme = IsDarkTheme;
+                settings.LastUpdatedBy = ResolveUpdatedBy();
+                settings.LastUpdatedAt = DateTime.Now;
+
+                _settingsStorageService.Save(settings);
+
+                LastUpdatedInformation = BuildLastUpdatedText(settings);
+                SuccessMessage = "Đã lưu cài đặt giao diện thành công.";
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Không thể lưu cài đặt giao diện. Vui lòng thử lại.";
+            }
+        }
+
         private void RestoreDefaults()
         {
             ClearStatus();
 
             try
             {
-                SoftwareSettingsModel defaults = SoftwareSettingsModel.CreateDefault();
-                defaults.LastUpdatedBy = ResolveUpdatedBy();
-                defaults.LastUpdatedAt = DateTime.Now;
-
-                ApplySettings(defaults);
-                _settingsStorageService.Save(defaults);
-
-                LastUpdatedInformation = BuildLastUpdatedText(defaults);
-                SuccessMessage = "Đã khôi phục cài đặt mặc định.";
+                if (CanEditSystemSettings)
+                {
+                    RestoreSystemDefaults();
+                }
+                else
+                {
+                    RestoreAppearanceDefaults();
+                }
             }
             catch (Exception)
             {
@@ -326,9 +388,42 @@ namespace CoffeeTea.ViewModels
             }
         }
 
+        private void RestoreSystemDefaults()
+        {
+            SoftwareSettingsModel defaults = SoftwareSettingsModel.CreateDefault();
+            defaults.LastUpdatedBy = ResolveUpdatedBy();
+            defaults.LastUpdatedAt = DateTime.Now;
+
+            ApplySettings(defaults);
+            _settingsStorageService.Save(defaults);
+
+            LastUpdatedInformation = BuildLastUpdatedText(defaults);
+            SuccessMessage = "Đã khôi phục cài đặt mặc định.";
+        }
+
+        private void RestoreAppearanceDefaults()
+        {
+            SoftwareSettingsModel settings = _settingsStorageService.Load();
+            settings.IsDarkTheme = SoftwareSettingsModel.CreateDefault().IsDarkTheme;
+            settings.LastUpdatedBy = ResolveUpdatedBy();
+            settings.LastUpdatedAt = DateTime.Now;
+
+            ApplySettings(settings);
+            _settingsStorageService.Save(settings);
+
+            LastUpdatedInformation = BuildLastUpdatedText(settings);
+            SuccessMessage = "Đã khôi phục cài đặt giao diện mặc định.";
+        }
+
         private void CreateBackup()
         {
             ClearStatus();
+
+            if (!CanEditSystemSettings)
+            {
+                ErrorMessage = "Tài khoản nhân viên không có quyền sao lưu cấu hình hệ thống.";
+                return;
+            }
 
             try
             {
@@ -452,6 +547,28 @@ namespace CoffeeTea.ViewModels
         private static string Normalize(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
+        }
+
+        private bool IsSystemSettingsEditor()
+        {
+            string roleCode = _authenticatedUser != null ? _authenticatedUser.MaVaiTro : null;
+            string roleName = _authenticatedUser?.VaiTro != null ? _authenticatedUser.VaiTro.TenVaiTro : null;
+
+            if (string.Equals(roleCode, "VT01", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(roleCode, "VT02", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(roleName))
+            {
+                return false;
+            }
+
+            string normalizedRoleName = roleName.Trim();
+            return normalizedRoleName.IndexOf("admin", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   normalizedRoleName.IndexOf("quản lý", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   normalizedRoleName.IndexOf("quan ly", StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }
