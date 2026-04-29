@@ -31,16 +31,45 @@
                            Style="{StaticResource BodyTextStyle}"
                            TextWrapping="Wrap"
                            Margin="0,14,0,0"/>
-
+<!--Đăng nhập nhanh cho mục đỡ test, không cần nhập mật khẩu, chỉ cần click vào là đăng nhập luôn-->
                 <Border Style="{StaticResource StatusBadgeBorderStyle}"
                         Margin="0,18,0,0"
                         HorizontalAlignment="Left">
-                    <TextBlock Text="Tài khoản mẫu: admin / quanly / nhanvien1 - Mật khẩu: 123456"
-                               Style="{StaticResource CaptionTextStyle}"/>
+                      <StackPanel>
+                            <TextBlock Text="Đăng nhập nhanh"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       Margin="10"/>
+                            <StackPanel Orientation="Horizontal">
+                                  <Button Grid.Column="0"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Height="40"
+                                    IsDefault="True"
+                                    Command="{Binding QuickLoginCommand}"
+                                    CommandParameter="admin"> 
+                                    <TextBlock Text="Admin"/>
+                                    </Button>
+                                  <Button Grid.Column="0"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Height="40"
+                                        IsDefault="True"
+                                        Command="{Binding QuickLoginCommand}"
+                                        CommandParameter="quanly1">
+                                        <TextBlock Text="Quản lý"/>
+                                   </Button> 
+                                  <Button Grid.Column="0"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Height="40"
+                                        IsDefault="True"
+                                        Command="{Binding QuickLoginCommand}"
+                                        CommandParameter="nhanvien1">
+                                        <TextBlock Text="Nhân viên"/>
+                                  </Button> 
+                            </StackPanel>
+                    </StackPanel>
                 </Border>
             </StackPanel>
         </Border>
-
+<!--    .........................................................                 -->
         <Border Grid.Column="1"
                 Style="{StaticResource CardStyle}">
             <StackPanel VerticalAlignment="Center">
