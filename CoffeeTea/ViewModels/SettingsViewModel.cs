@@ -55,18 +55,6 @@ namespace CoffeeTea.ViewModels
             get { return true; }
         }
 
-        public string PermissionSummary
-        {
-            get
-            {
-                if (CanEditSystemSettings)
-                {
-                    return "Bạn có quyền chỉnh thông tin cửa hàng, vận hành hệ thống, giao diện và sao lưu cấu hình.";
-                }
-
-                return "Tài khoản nhân viên chỉ được chỉnh cài đặt giao diện của ứng dụng.";
-            }
-        }
 
         public string RestoreDefaultsButtonText
         {
