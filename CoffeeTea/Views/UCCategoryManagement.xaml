@@ -33,7 +33,11 @@
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="2" CornerRadius="10" BorderThickness="1" BorderBrush="{StaticResource Brush.BorderSoft}" ClipToBounds="True">
+        <Border Grid.Row="2"
+                CornerRadius="{StaticResource Radius.Medium}"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource Brush.BorderSoft}"
+                ClipToBounds="True">
             <DataGrid Style="{StaticResource AppDataGridStyle}" 
                       ItemsSource="{Binding Categories}" 
                       SelectedItem="{Binding SelectedCategory}" 
