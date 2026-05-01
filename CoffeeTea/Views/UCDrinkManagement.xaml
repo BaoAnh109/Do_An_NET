@@ -3,10 +3,67 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CoffeeTea.Views"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             mc:Ignorable="d">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="QUẢN LÝ MÓN ĂN" Style="{StaticResource TitleTextStyle}" Margin="0,0,0,15"/>
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Background="{StaticResource Brush.Sidebar}" Padding="15" Margin="0,0,0,15">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="0,0,15,0">
+                    <TextBlock Text="Tên món" Style="{StaticResource LabelTextStyle}"/>
+                    <TextBox Width="180" Style="{StaticResource AppTextBoxStyle}" Text="{Binding TenMon}"/>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,15,0">
+                    <TextBlock Text="Danh mục" Style="{StaticResource LabelTextStyle}"/>
+                    <ComboBox Width="140" Style="{StaticResource AppComboBoxStyle}" 
+                              ItemsSource="{Binding Categories}" DisplayMemberPath="TenDanhMuc" SelectedItem="{Binding SelectedCategoryInForm}"/>
+                </StackPanel>
+
+                <StackPanel Margin="0,0,15,0">
+                    <TextBlock Text="Giá" Style="{StaticResource LabelTextStyle}"/>
+                    <TextBox Width="90" Style="{StaticResource AppTextBoxStyle}" Text="{Binding DonGia}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="5,0,0,8">
+                    <Button Content="Thêm" Style="{StaticResource SuccessButtonStyle}" Width="80" Margin="0,0,5,0"/>
+                    <Button Content="Sửa" Style="{StaticResource PrimaryButtonStyle}" Width="80" Margin="0,0,5,0"/>
+                    <Button Content="Xóa" Style="{StaticResource DangerButtonStyle}" Width="80"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2" CornerRadius="10" BorderThickness="1" BorderBrush="{StaticResource Brush.BorderSoft}" ClipToBounds="True">
+            <DataGrid Style="{StaticResource AppDataGridStyle}" 
+          ItemsSource="{Binding Drinks}" 
+          SelectedItem="{Binding SelectedDrink}" 
+          BorderThickness="0"
+          RowHeaderWidth="0"
+          HorizontalGridLinesBrush="Transparent">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="2*">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="Mã món" Margin="15,0,0,0"/>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding MaMon}" Margin="15,0,0,0" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Tên món" Binding="{Binding TenMon}" Width="3*"/>
+                    <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMucMon.TenDanhMuc}" Width="3*"/>
+                    <DataGridTextColumn Header="Giá" Binding="{Binding DonGia, StringFormat={}{0:N0}đ}" Width="1*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
     </Grid>
 </UserControl>
