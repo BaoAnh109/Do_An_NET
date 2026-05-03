@@ -129,6 +129,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Services\SettingsStorageService.cs" />
+    <Compile Include="Services\ThemeManager.cs" />
     <Compile Include="Models\Ban.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
@@ -162,6 +164,7 @@
     <Compile Include="Models\PhieuNhap.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\SoftwareSettingsModel.cs" />
     <Compile Include="Models\QLCoffeeTeaModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -187,13 +190,16 @@
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\DashboardViewModel.cs" />
     <Compile Include="ViewModels\DrinkViewModel.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ProfileViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="Views\LoginView.xaml.cs">
+      <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\UCChangePassword.xaml.cs">
-      <DependentUpon>UCChangePassword.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UCCategoryManagement.xaml.cs">
       <DependentUpon>UCCategoryManagement.xaml</DependentUpon>
@@ -218,6 +224,9 @@
     </Compile>
     <Compile Include="Views\UCProfile.xaml.cs">
       <DependentUpon>UCProfile.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UCSettings.xaml.cs">
+      <DependentUpon>UCSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UCStaffManagement.xaml.cs">
       <DependentUpon>UCStaffManagement.xaml</DependentUpon>
@@ -272,11 +281,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainView.xaml">
+    <Page Include="Views\LoginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\UCChangePassword.xaml">
+    <Page Include="Views\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -309,6 +318,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\UCProfile.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UCSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -359,3 +372,4 @@
   <Import Project="..\packages\SkiaSharp.NativeAssets.Win32.3.119.2\build\net462\SkiaSharp.NativeAssets.Win32.targets" Condition="Exists('..\packages\SkiaSharp.NativeAssets.Win32.3.119.2\build\net462\SkiaSharp.NativeAssets.Win32.targets')" />
   <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.targets')" />
 </Project>
+
