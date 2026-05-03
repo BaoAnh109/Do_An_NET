@@ -23,6 +23,7 @@ namespace CoffeeTea.Views
         public UCCategoryManagement()
         {
             InitializeComponent();
+            this.DataContext = new CoffeeTea.ViewModels.CategoryViewModel();
         }
     }
 }
