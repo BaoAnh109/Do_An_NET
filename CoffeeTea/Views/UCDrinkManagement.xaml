@@ -19,7 +19,7 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel Margin="0,0,15,0">
                     <TextBlock Text="Tên món" Style="{StaticResource LabelTextStyle}"/>
-                    <TextBox Width="180" Style="{StaticResource AppTextBoxStyle}" Text="{Binding TenMon}"/>
+                    <TextBox Width="180" Style="{StaticResource AppTextBoxStyle }" Text="{Binding TenMon,UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel Margin="0,0,15,0">
@@ -27,16 +27,21 @@
                     <ComboBox Width="140" Style="{StaticResource AppComboBoxStyle}" 
                               ItemsSource="{Binding Categories}" DisplayMemberPath="TenDanhMuc" SelectedItem="{Binding SelectedCategoryInForm}"/>
                 </StackPanel>
+                <StackPanel Margin="0,0,15,0">
+                    <TextBlock Text="ĐVT" Style="{StaticResource LabelTextStyle}"/>
+                    <TextBox Width="80" Style="{StaticResource AppTextBoxStyle}" 
+             Text="{Binding DonViTinh, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
 
                 <StackPanel Margin="0,0,15,0">
                     <TextBlock Text="Giá" Style="{StaticResource LabelTextStyle}"/>
-                    <TextBox Width="90" Style="{StaticResource AppTextBoxStyle}" Text="{Binding DonGia}"/>
+                    <TextBox Width="90" Style="{StaticResource AppTextBoxStyle}" Text="{Binding DonGia,UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="5,0,0,8">
-                    <Button Content="Thêm" Style="{StaticResource SuccessButtonStyle}" Width="80" Margin="0,0,5,0"/>
-                    <Button Content="Sửa" Style="{StaticResource PrimaryButtonStyle}" Width="80" Margin="0,0,5,0"/>
-                    <Button Content="Xóa" Style="{StaticResource DangerButtonStyle}" Width="80"/>
+                    <Button Content="Thêm" Command="{Binding AddCommand}" Style="{StaticResource SuccessButtonStyle}" Width="80" Margin="0,0,5,0"/>
+                    <Button Content="Sửa" Command="{Binding EditCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="80" Margin="0,0,5,0"/>
+                    <Button Content="Xóa" Command="{Binding DeleteCommand}" Style="{StaticResource DangerButtonStyle}" Width="80"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -61,6 +66,8 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Tên món" Binding="{Binding TenMon}" Width="3*"/>
                     <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMucMon.TenDanhMuc}" Width="3*"/>
+                    <DataGridTextColumn Header="Trạng thái" Binding="{Binding TrangThai}" Width="2*"/>
+                    <DataGridTextColumn Header="ĐVT" Binding="{Binding DonViTinh}" Width="2*"/>
                     <DataGridTextColumn Header="Giá" Binding="{Binding DonGia, StringFormat={}{0:N0}đ}" Width="1*"/>
                 </DataGrid.Columns>
             </DataGrid>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoffeeTea.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace CoffeeTea.Views
         public UCDrinkManagement()
         {
             InitializeComponent();
+            this.DataContext = new DrinkViewModel();
         }
     }
 }
