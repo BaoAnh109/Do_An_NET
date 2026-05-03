@@ -45,7 +45,7 @@
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="390"/>
             </Grid.ColumnDefinitions>
 
 
@@ -75,33 +75,47 @@
                     <TextBlock Text="Tài khoản đang đăng nhập"
                    Style="{StaticResource SectionTitleTextStyle}"/>
 
-                    <StackPanel Grid.Row="2"
-                    Orientation="Horizontal">
-                        <Border Width="64"
-                    Height="64"
-                    CornerRadius="32"
-                    Background="{DynamicResource Brush.PrimaryLight}"
-                    BorderBrush="{DynamicResource Brush.BorderSoft}"
-                    BorderThickness="1">
-                            <TextBlock Text="{Binding CurrentAccountInitial}"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="24"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource Brush.PrimaryDark}"/>
-                        </Border>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                        <StackPanel Margin="14,0,0,0"
-                        VerticalAlignment="Center">
+                        <Grid Width="64"
+                              Height="64">
+                            <Ellipse Fill="{DynamicResource Brush.PrimaryLight}"
+                                     Stroke="{DynamicResource Brush.BorderSoft}"
+                                     StrokeThickness="1"/>
+                            <Ellipse Visibility="{Binding CurrentAccountAvatarImageVisibility}"
+                                     Stroke="{DynamicResource Brush.BorderSoft}"
+                                     StrokeThickness="1">
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="{Binding CurrentAccountAvatarPath}"
+                                                Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <TextBlock Text="{Binding CurrentAccountInitial}"
+                                       Visibility="{Binding CurrentAccountInitialVisibility}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="24"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource Brush.PrimaryDark}"/>
+                        </Grid>
+
+                        <StackPanel Grid.Column="2"
+                                    VerticalAlignment="Center">
                             <TextBlock Text="{Binding CurrentAccountName}"
-                           Style="{StaticResource SectionTitleTextStyle}"
-                           FontSize="20"/>
+                                       Style="{StaticResource SectionTitleTextStyle}"
+                                       FontSize="20"
+                                       TextWrapping="Wrap"/>
                             <TextBlock Text="{Binding CurrentAccountRole}"
-                           Style="{StaticResource BodyTextStyle}"
-                           Foreground="{DynamicResource Brush.TextSecondary}"
-                           Margin="0,4,0,0"/>
+                                       Style="{StaticResource BodyTextStyle}"
+                                       Foreground="{DynamicResource Brush.TextSecondary}"
+                                       Margin="0,4,0,0"/>
                         </StackPanel>
-                    </StackPanel>
+                    </Grid>
 
                     <StackPanel Grid.Row="4">
                         <TextBlock Text="Nguồn đăng nhập"
@@ -142,7 +156,7 @@
             <Border Grid.Column="0"
                         Style="{StaticResource HighlightCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="Doanh thu hôm nay"
+                    <TextBlock Text="{Binding RevenueMetricTitle}"
                                    Style="{StaticResource CaptionTextStyle}"/>
                     <TextBlock Text="{Binding TodayRevenue}"
                                    Style="{StaticResource SectionTitleTextStyle}"
@@ -154,7 +168,7 @@
                         Style="{StaticResource CardStyle}"
                         Background="{DynamicResource Brush.Success}">
                 <StackPanel>
-                    <TextBlock Text="Số hóa đơn"
+                    <TextBlock Text="{Binding InvoiceMetricTitle}"
                                    Style="{StaticResource CaptionTextStyle}"/>
                     <TextBlock Text="{Binding InvoiceCount}"
                                    Style="{StaticResource SectionTitleTextStyle}"
@@ -186,7 +200,7 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <!-- Mock revenue chart -->
+        <!-- Revenue chart -->
         <Grid Grid.Row="6">
             <Border Height="190"
             Padding="18"
@@ -202,7 +216,7 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" Margin="0,0,0,8">
-                        <TextBlock Text="Biểu đồ doanh thu theo giờ"
+                        <TextBlock Text="{Binding RevenueChartTitle}"
                            FontSize="15"
                            FontWeight="Bold"
                            Foreground="{DynamicResource Brush.ChartTitle}"
@@ -230,15 +244,15 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0"
-                                       Text="12M"
+                                       Text="{Binding RevenueAxisTopLabel}"
                                        Style="{StaticResource CaptionTextStyle}"
                                        VerticalAlignment="Top"/>
                             <TextBlock Grid.Row="1"
-                                       Text="8M"
+                                       Text="{Binding RevenueAxisHighLabel}"
                                        Style="{StaticResource CaptionTextStyle}"
                                        VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="2"
-                                       Text="4M"
+                                       Text="{Binding RevenueAxisLowLabel}"
                                        Style="{StaticResource CaptionTextStyle}"
                                        VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="3"

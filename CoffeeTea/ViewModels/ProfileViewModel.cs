@@ -5,17 +5,14 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using CoffeeTea.Models;
+using CoffeeTea.Services;
 using Microsoft.Win32;
 
 namespace CoffeeTea.ViewModels
 {
     public class ProfileViewModel : BaseViewModel
     {
-        private const string DefaultAvatarRelativePath = "Images/Employees/default-avatar.png";
-        private const string EmployeeAvatarRelativeFolder = "Images/Employees";
-
         private readonly string _maNhanVien;
 
         private string _fullName;
@@ -152,7 +149,7 @@ namespace CoffeeTea.ViewModels
             get { return _anhDaiDien; }
             set
             {
-                string normalizedValue = NormalizeRelativePath(value);
+                string normalizedValue = AvatarDisplayService.NormalizeRelativePath(value);
                 if (_anhDaiDien == normalizedValue)
                 {
                     return;
@@ -311,7 +308,7 @@ namespace CoffeeTea.ViewModels
             if (!CanEditProfile)
             {
                 ErrorMessage = "Không xác định được tài khoản đang đăng nhập.";
-                AnhDaiDien = DefaultAvatarRelativePath;
+                AnhDaiDien = AvatarDisplayService.DefaultAvatarRelativePath;
                 return;
             }
 
@@ -326,7 +323,7 @@ namespace CoffeeTea.ViewModels
                     if (user == null)
                     {
                         ErrorMessage = "Không tìm thấy thông tin tài khoản trong cơ sở dữ liệu.";
-                        AnhDaiDien = DefaultAvatarRelativePath;
+                        AnhDaiDien = AvatarDisplayService.DefaultAvatarRelativePath;
                         return;
                     }
 
@@ -337,14 +334,14 @@ namespace CoffeeTea.ViewModels
                     Address = user.DiaChi;
                     RoleName = user.VaiTro != null ? user.VaiTro.TenVaiTro : "Không xác định";
                     AnhDaiDien = string.IsNullOrWhiteSpace(user.AnhDaiDien)
-                        ? DefaultAvatarRelativePath
+                        ? AvatarDisplayService.DefaultAvatarRelativePath
                         : user.AnhDaiDien;
                 }
             }
             catch (Exception)
             {
                 ErrorMessage = "Không thể tải thông tin tài khoản. Vui lòng kiểm tra kết nối dữ liệu.";
-                AnhDaiDien = DefaultAvatarRelativePath;
+                AnhDaiDien = AvatarDisplayService.DefaultAvatarRelativePath;
             }
         }
 
@@ -380,7 +377,7 @@ namespace CoffeeTea.ViewModels
                     user.Email = NormalizeNullable(Email);
                     user.DiaChi = NormalizeNullable(Address);
                     user.AnhDaiDien = string.IsNullOrWhiteSpace(AnhDaiDien)
-                        ? DefaultAvatarRelativePath
+                        ? AvatarDisplayService.DefaultAvatarRelativePath
                         : AnhDaiDien;
 
                     context.SaveChanges();
@@ -427,12 +424,12 @@ namespace CoffeeTea.ViewModels
 
             try
             {
-                string destinationDirectory = ResolveApplicationPath(EmployeeAvatarRelativeFolder);
+                string destinationDirectory = AvatarDisplayService.ResolveApplicationPath(AvatarDisplayService.EmployeeAvatarRelativeFolder);
                 Directory.CreateDirectory(destinationDirectory);
 
                 string fileName = BuildEmployeeAvatarFileName(extension);
-                string relativePath = EmployeeAvatarRelativeFolder + "/" + fileName;
-                string destinationFilePath = ResolveApplicationPath(relativePath);
+                string relativePath = AvatarDisplayService.EmployeeAvatarRelativeFolder + "/" + fileName;
+                string destinationFilePath = AvatarDisplayService.ResolveApplicationPath(relativePath);
 
                 if (!string.Equals(
                     Path.GetFullPath(sourceFilePath),
@@ -518,12 +515,12 @@ namespace CoffeeTea.ViewModels
         private void RefreshAvatarDisplay()
         {
             string relativePath = string.IsNullOrWhiteSpace(AnhDaiDien)
-                ? DefaultAvatarRelativePath
+                ? AvatarDisplayService.DefaultAvatarRelativePath
                 : AnhDaiDien;
 
-            string absolutePath = ResolveApplicationPath(relativePath);
+            string absolutePath = AvatarDisplayService.ResolveAvatarPath(relativePath);
 
-            ImageSource imageSource = LoadAvatarImage(absolutePath);
+            ImageSource imageSource = AvatarDisplayService.LoadAvatarImage(absolutePath);
             if (imageSource != null)
             {
                 AvatarPath = imageSource;
@@ -541,30 +538,6 @@ namespace CoffeeTea.ViewModels
         private void UpdateAvatarInitials()
         {
             AvatarInitials = BuildInitials(FullName);
-        }
-
-        private static ImageSource LoadAvatarImage(string absolutePath)
-        {
-            if (string.IsNullOrWhiteSpace(absolutePath) || !File.Exists(absolutePath))
-            {
-                return null;
-            }
-
-            try
-            {
-                BitmapImage bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.UriSource = new Uri(absolutePath, UriKind.Absolute);
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
-
-                return bitmapImage;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         private string BuildEmployeeAvatarFileName(string extension)
@@ -602,54 +575,6 @@ namespace CoffeeTea.ViewModels
             return string.Equals(extension, ".jpg", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(extension, ".jpeg", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(extension, ".png", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static string ResolveApplicationPath(string relativePath)
-        {
-            if (string.IsNullOrWhiteSpace(relativePath))
-            {
-                relativePath = DefaultAvatarRelativePath;
-            }
-
-            if (Path.IsPathRooted(relativePath))
-            {
-                return relativePath;
-            }
-
-            string normalizedPath = relativePath
-                .Replace('/', Path.DirectorySeparatorChar)
-                .Replace('\\', Path.DirectorySeparatorChar);
-
-            return Path.Combine(GetProjectRootDirectory(), normalizedPath);
-        }
-
-        private static string GetProjectRootDirectory()
-        {
-            DirectoryInfo directory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-
-            while (directory != null)
-            {
-                if (File.Exists(Path.Combine(directory.FullName, "CoffeeTea.csproj")))
-                {
-                    return directory.FullName;
-                }
-
-                directory = directory.Parent;
-            }
-
-            return AppDomain.CurrentDomain.BaseDirectory;
-        }
-
-        private static string NormalizeRelativePath(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return null;
-            }
-
-            return value.Trim()
-                .TrimStart('/', '\\')
-                .Replace('\\', '/');
         }
 
         private void ClearMessages()

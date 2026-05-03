@@ -186,6 +186,7 @@
     <Compile Include="Services\SettingsStorageService.cs" />
     <Compile Include="Services\ThemeManager.cs" />
     <Compile Include="Models\SoftwareSettingsModel.cs" />
+    <Compile Include="Services\AvatarDisplayService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\DashboardViewModel.cs" />
