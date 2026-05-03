@@ -42,7 +42,9 @@
                       ItemsSource="{Binding Categories}" 
                       SelectedItem="{Binding SelectedCategory}" 
                       RowHeaderWidth="0"
-                      BorderThickness="0">
+                      GridLinesVisibility="None"
+                      BorderThickness="0"
+                      VerticalGridLinesBrush="Transparent">
                 <DataGrid.Columns>
 
                     <DataGridTemplateColumn Width="2*">
