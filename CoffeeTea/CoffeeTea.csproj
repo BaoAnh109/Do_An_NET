@@ -129,8 +129,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Services\SettingsStorageService.cs" />
-    <Compile Include="Services\ThemeManager.cs" />
     <Compile Include="Models\Ban.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
@@ -164,7 +162,6 @@
     <Compile Include="Models\PhieuNhap.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SoftwareSettingsModel.cs" />
     <Compile Include="Models\QLCoffeeTeaModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -186,6 +183,9 @@
     <Compile Include="Models\VaiTro.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Services\SettingsStorageService.cs" />
+    <Compile Include="Services\ThemeManager.cs" />
+    <Compile Include="Models\SoftwareSettingsModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\DashboardViewModel.cs" />
@@ -345,7 +345,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Images\Employees\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Models\QLCoffeeTeaModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -372,4 +374,3 @@
   <Import Project="..\packages\SkiaSharp.NativeAssets.Win32.3.119.2\build\net462\SkiaSharp.NativeAssets.Win32.targets" Condition="Exists('..\packages\SkiaSharp.NativeAssets.Win32.3.119.2\build\net462\SkiaSharp.NativeAssets.Win32.targets')" />
   <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.targets')" />
 </Project>
-
