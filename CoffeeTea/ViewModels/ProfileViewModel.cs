@@ -620,7 +620,24 @@ namespace CoffeeTea.ViewModels
                 .Replace('/', Path.DirectorySeparatorChar)
                 .Replace('\\', Path.DirectorySeparatorChar);
 
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, normalizedPath);
+            return Path.Combine(GetProjectRootDirectory(), normalizedPath);
+        }
+
+        private static string GetProjectRootDirectory()
+        {
+            DirectoryInfo directory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+
+            while (directory != null)
+            {
+                if (File.Exists(Path.Combine(directory.FullName, "CoffeeTea.csproj")))
+                {
+                    return directory.FullName;
+                }
+
+                directory = directory.Parent;
+            }
+
+            return AppDomain.CurrentDomain.BaseDirectory;
         }
 
         private static string NormalizeRelativePath(string value)
