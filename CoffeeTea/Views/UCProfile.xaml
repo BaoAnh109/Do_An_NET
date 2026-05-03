@@ -25,17 +25,49 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="20"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="20"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0"
-                               Grid.ColumnSpan="3"
+                               Grid.ColumnSpan="5"
                                Text="Thông tin tài khoản"
                                Style="{StaticResource SectionTitleTextStyle}"/>
 
                     <StackPanel Grid.Row="2" Grid.Column="0">
+                        <TextBlock Text="Ảnh đại diện" Style="{StaticResource LabelTextStyle}"/>
+                        <Grid Width="126"
+                              Height="126"
+                              Margin="0,0,0,12">
+                            <Ellipse Fill="{DynamicResource Brush.WindowBackground}"
+                                     Stroke="{DynamicResource Brush.BorderSoft}"
+                                     StrokeThickness="1"/>
+                            <Ellipse Visibility="{Binding AvatarImageVisibility}"
+                                     Stroke="{DynamicResource Brush.BorderSoft}"
+                                     StrokeThickness="1">
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="{Binding AvatarPath}"
+                                                Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <TextBlock Text="{Binding AvatarInitials}"
+                                       Visibility="{Binding AvatarInitialsVisibility}"
+                                       Foreground="{DynamicResource Brush.PrimaryDark}"
+                                       FontSize="34"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button Content="Chọn ảnh"
+                                Width="126"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Command="{Binding SelectAvatarCommand}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="2">
                         <TextBlock Text="Họ tên" Style="{StaticResource LabelTextStyle}"/>
                         <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource AppTextBoxStyle}"/>
@@ -49,7 +81,7 @@
                                  Style="{StaticResource AppTextBoxStyle}"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="2" Grid.Column="2">
+                    <StackPanel Grid.Row="2" Grid.Column="4">
                         <TextBlock Text="Tên đăng nhập" Style="{StaticResource LabelTextStyle}"/>
                         <TextBox Text="{Binding Username}"
                                  IsReadOnly="True"
@@ -78,7 +110,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="3"
-                                Grid.ColumnSpan="3"
+                                Grid.ColumnSpan="5"
                                 Orientation="Horizontal"
                                 Margin="0,10,0,0">
                         <Button Content="Lưu thông tin"
@@ -87,7 +119,7 @@
                                 Command="{Binding SaveProfileCommand}"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Margin="0,6,0,0">
+                    <StackPanel Grid.Row="4" Grid.ColumnSpan="5" Margin="0,6,0,0">
                         <TextBlock Text="{Binding SuccessMessage}"
                                    Foreground="{DynamicResource Brush.PrimaryDark}"
                                    FontWeight="SemiBold"

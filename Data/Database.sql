@@ -4,6 +4,7 @@
 --  He QTCSDL: SQL Server
 -- =============================================
 
+
 IF DB_ID(N'QL_CoffeeTea') IS NOT NULL
 BEGIN
     DROP DATABASE QL_CoffeeTea;
@@ -41,6 +42,7 @@ CREATE TABLE NhanVien
     SoDienThoai     VARCHAR(15)     NULL,
     Email           VARCHAR(100)    NULL,
     DiaChi          NVARCHAR(200)   NULL,
+    AnhDaiDien      NVARCHAR(255)   NULL,
     TenDangNhap     VARCHAR(50)     NOT NULL UNIQUE,
     MatKhau         VARCHAR(100)    NOT NULL,
     MaVaiTro        VARCHAR(10)     NOT NULL,
@@ -228,18 +230,18 @@ GO
 
 -- 2. NHAN VIEN
 INSERT INTO NhanVien
-(MaNhanVien, HoTen, GioiTinh, NgaySinh, SoDienThoai, Email, DiaChi, TenDangNhap, MatKhau, MaVaiTro, NgayVaoLam, LuongCoBan, TrangThai)
+(MaNhanVien, HoTen, GioiTinh, NgaySinh, SoDienThoai, Email, DiaChi, AnhDaiDien, TenDangNhap, MatKhau, MaVaiTro, NgayVaoLam, LuongCoBan, TrangThai)
 VALUES
-('NV01', N'Nguyễn Hoàng Anh', N'Nam', '1999-03-15', '0901000001', 'admin123',  N'Quận 1',  'admin',   '123456', 'VT01', '2023-01-10', 15000000, N'Đang làm'),
-('NV02', N'Trần Mỹ Linh',     N'Nữ',  '2000-07-20', '0901000002', 'ql123',    N'Quận 3',  'quanly1', '123456', 'VT02', '2023-03-12', 12000000, N'Đang làm'),
-('NV03', N'Lê Quốc Bảo',      N'Nam', '1998-11-05', '0901000003', 'ql2@coffee.vn',    N'Quận 5',  'quanly2', '123456', 'VT02', '2022-12-01', 12000000, N'Đang làm'),
-('NV04', N'Phạm Thu Hà',      N'Nữ',  '2001-01-18', '0901000004', 'nv123',    N'Quận 10', 'nhanvien1','123456', 'VT03', '2023-05-01',  7000000, N'Đang làm'),
-('NV05', N'Võ Minh Tâm',      N'Nam', '1997-09-09', '0901000005', 'nv2@coffee.vn',    N'Tân Bình','nhanvien2','123456', 'VT03', '2022-10-15',  7000000, N'Đang làm'),
-('NV06', N'Đặng Ngọc Mai',    N'Nữ',  '1996-12-25', '0901000006', 'nv3@coffee.vn',    N'Phú Nhuận','nhanvien3','123456', 'VT03', '2022-11-20',  7000000, N'Đang làm'),
-('NV07', N'Bùi Thanh Nam',    N'Nam', '1995-04-30', '0901000007', 'nv4@coffee.vn',    N'Bình Thạnh','nhanvien4','123456', 'VT03', '2022-09-10', 7000000, N'Đang làm'),
-('NV08', N'Ngô Gia Hân',      N'Nữ',  '2002-08-14', '0901000008', 'nv5@coffee.vn',    N'Gò Vấp',  'nhanvien5','123456', 'VT03', '2024-01-05',  6500000, N'Đang làm'),
-('NV09', N'Phan Quốc Khánh',  N'Nam', '1994-06-06', '0901000009', 'nv6@coffee.vn',    N'Thủ Đức', 'nhanvien6','123456', 'VT03', '2021-08-08',  7500000, N'Đang làm'),
-('NV10', N'Tạ Thảo Nhi',      N'Nữ',  '2003-10-11', '0901000010', 'nv7@coffee.vn',    N'Quận 7',  'nhanvien7','123456', 'VT03', '2024-06-01',  6000000, N'Đang làm');
+('NV01', N'Nguyễn Hoàng Anh', N'Nam', '1999-03-15', '0901000001', 'admin123',  N'Quận 1', N'Images/Employees/default-avatar.png', 'admin',   '123456', 'VT01', '2023-01-10', 15000000, N'Đang làm'),
+('NV02', N'Trần Mỹ Linh',     N'Nữ',  '2000-07-20', '0901000002', 'ql123',    N'Quận 3', N'Images/Employees/default-avatar.png', 'quanly1', '123456', 'VT02', '2023-03-12', 12000000, N'Đang làm'),
+('NV03', N'Lê Quốc Bảo',      N'Nam', '1998-11-05', '0901000003', 'ql2@coffee.vn',    N'Quận 5', N'Images/Employees/default-avatar.png', 'quanly2', '123456', 'VT02', '2022-12-01', 12000000, N'Đang làm'),
+('NV04', N'Phạm Thu Hà',      N'Nữ',  '2001-01-18', '0901000004', 'nv123',    N'Quận 10', N'Images/Employees/default-avatar.png', 'nhanvien1','123456', 'VT03', '2023-05-01',  7000000, N'Đang làm'),
+('NV05', N'Võ Minh Tâm',      N'Nam', '1997-09-09', '0901000005', 'nv2@coffee.vn',    N'Tân Bình', N'Images/Employees/default-avatar.png', 'nhanvien2','123456', 'VT03', '2022-10-15',  7000000, N'Đang làm'),
+('NV06', N'Đặng Ngọc Mai',    N'Nữ',  '1996-12-25', '0901000006', 'nv3@coffee.vn',    N'Phú Nhuận', N'Images/Employees/default-avatar.png', 'nhanvien3','123456', 'VT03', '2022-11-20',  7000000, N'Đang làm'),
+('NV07', N'Bùi Thanh Nam',    N'Nam', '1995-04-30', '0901000007', 'nv4@coffee.vn',    N'Bình Thạnh', N'Images/Employees/default-avatar.png', 'nhanvien4','123456', 'VT03', '2022-09-10', 7000000, N'Đang làm'),
+('NV08', N'Ngô Gia Hân',      N'Nữ',  '2002-08-14', '0901000008', 'nv5@coffee.vn',    N'Gò Vấp', N'Images/Employees/default-avatar.png', 'nhanvien5','123456', 'VT03', '2024-01-05',  6500000, N'Đang làm'),
+('NV09', N'Phan Quốc Khánh',  N'Nam', '1994-06-06', '0901000009', 'nv6@coffee.vn',    N'Thủ Đức', N'Images/Employees/default-avatar.png', 'nhanvien6','123456', 'VT03', '2021-08-08',  7500000, N'Đang làm'),
+('NV10', N'Tạ Thảo Nhi',      N'Nữ',  '2003-10-11', '0901000010', 'nv7@coffee.vn',    N'Quận 7', N'Images/Employees/default-avatar.png', 'nhanvien7','123456', 'VT03', '2024-06-01',  6000000, N'Đang làm');
 GO
 -- 3. DANH MUC MON
 INSERT INTO DanhMucMon (MaDanhMuc, TenDanhMuc, MoTa) VALUES
