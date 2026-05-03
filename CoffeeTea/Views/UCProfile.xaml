@@ -53,11 +53,19 @@
                         <TextBlock Text="Tên đăng nhập" Style="{StaticResource LabelTextStyle}"/>
                         <TextBox Text="{Binding Username}"
                                  IsReadOnly="True"
+                                 IsEnabled="False"
+                                 Opacity="0.4"
+                                 Background="{DynamicResource Brush.WindowBackground}"
+                                 Foreground="{DynamicResource Brush.TextSecondary}"
                                  Style="{StaticResource AppTextBoxStyle}"/>
 
                         <TextBlock Text="Vai trò" Style="{StaticResource LabelTextStyle}"/>
                         <TextBox Text="{Binding RoleName}"
                                  IsReadOnly="True"
+                                 IsEnabled="False"
+                                 Opacity="0.4"
+                                 Background="{DynamicResource Brush.WindowBackground}"
+                                 Foreground="{DynamicResource Brush.TextSecondary}"
                                  Style="{StaticResource AppTextBoxStyle}"/>
 
                         <TextBlock Text="Địa chỉ" Style="{StaticResource LabelTextStyle}"/>
