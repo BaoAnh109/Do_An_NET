@@ -129,8 +129,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Services\SettingsStorageService.cs" />
-    <Compile Include="Services\ThemeManager.cs" />
     <Compile Include="Models\Ban.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
@@ -164,7 +162,6 @@
     <Compile Include="Models\PhieuNhap.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SoftwareSettingsModel.cs" />
     <Compile Include="Models\QLCoffeeTeaModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -183,6 +180,10 @@
     <Compile Include="Models\VaiTro.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Services\SettingsStorageService.cs" />
+    <Compile Include="Services\ThemeManager.cs" />
+    <Compile Include="Models\SoftwareSettingsModel.cs" />
+    <Compile Include="Services\AvatarDisplayService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\DashboardViewModel.cs" />
@@ -347,6 +348,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Resource Include="Images\Employees\default-avatar.png" />
     <Content Include="Models\QLCoffeeTeaModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>QLCoffeeTeaModel.edmx</DependentUpon>

@@ -30,12 +30,14 @@
                 <StackPanel Margin="0,0,15,0">
                     <TextBlock Text="ĐVT" Style="{StaticResource LabelTextStyle}"/>
                     <TextBox Width="80" Style="{StaticResource AppTextBoxStyle}" 
-             Text="{Binding DonViTinh, UpdateSourceTrigger=PropertyChanged}"/>
+                              Text="{Binding DonViTinh, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel Margin="0,0,15,0">
                     <TextBlock Text="Giá" Style="{StaticResource LabelTextStyle}"/>
-                    <TextBox Width="90" Style="{StaticResource AppTextBoxStyle}" Text="{Binding DonGia,UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Width="187" 
+                         Style="{StaticResource AppTextBoxStyle}" 
+                         Text="{Binding DonGia, UpdateSourceTrigger=LostFocus, StringFormat={}{0:N0}, ConverterCulture=vi-VN}"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="5,0,0,8">
@@ -56,6 +58,7 @@
           SelectedItem="{Binding SelectedDrink}" 
           BorderThickness="0"
           RowHeaderWidth="0"
+          GridLinesVisibility="None"
           HorizontalGridLinesBrush="Transparent">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Width="2*">
@@ -72,7 +75,7 @@
                     <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMucMon.TenDanhMuc}" Width="3*"/>
                     <DataGridTextColumn Header="Trạng thái" Binding="{Binding TrangThai}" Width="2*"/>
                     <DataGridTextColumn Header="ĐVT" Binding="{Binding DonViTinh}" Width="2*"/>
-                    <DataGridTextColumn Header="Giá" Binding="{Binding DonGia, StringFormat={}{0:N0}đ}" Width="1*"/>
+                    <DataGridTextColumn Header="Giá" Binding="{Binding DonGia, StringFormat={}{0:N0}đ, ConverterCulture=vi-VN}" Width="1*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

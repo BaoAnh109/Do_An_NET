@@ -1,8 +1,13 @@
-﻿using System;
+using System;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using CoffeeTea.Models;
+using CoffeeTea.Services;
+using Microsoft.Win32;
 
 namespace CoffeeTea.ViewModels
 {
@@ -16,6 +21,11 @@ namespace CoffeeTea.ViewModels
         private string _phoneNumber;
         private string _email;
         private string _address;
+        private string _anhDaiDien;
+        private ImageSource _avatarPath;
+        private string _avatarInitials;
+        private Visibility _avatarImageVisibility = Visibility.Collapsed;
+        private Visibility _avatarInitialsVisibility = Visibility.Visible;
 
         private string _currentPassword;
         private string _newPassword;
@@ -30,6 +40,7 @@ namespace CoffeeTea.ViewModels
 
             SaveProfileCommand = new RelayCommand(_ => ExecuteSaveProfile(), _ => CanEditProfile);
             ChangePasswordCommand = new RelayCommand(_ => ExecuteChangePassword(), _ => CanEditProfile);
+            SelectAvatarCommand = new RelayCommand(_ => ExecuteSelectAvatar(), _ => CanEditProfile);
 
             LoadProfileData();
         }
@@ -39,6 +50,8 @@ namespace CoffeeTea.ViewModels
         public ICommand SaveProfileCommand { get; private set; }
 
         public ICommand ChangePasswordCommand { get; private set; }
+
+        public ICommand SelectAvatarCommand { get; private set; }
 
         public string FullName
         {
@@ -52,6 +65,7 @@ namespace CoffeeTea.ViewModels
 
                 _fullName = value;
                 OnPropertyChanged(nameof(FullName));
+                UpdateAvatarInitials();
             }
         }
 
@@ -127,6 +141,83 @@ namespace CoffeeTea.ViewModels
 
                 _address = value;
                 OnPropertyChanged(nameof(Address));
+            }
+        }
+
+        public string AnhDaiDien
+        {
+            get { return _anhDaiDien; }
+            set
+            {
+                string normalizedValue = AvatarDisplayService.NormalizeRelativePath(value);
+                if (_anhDaiDien == normalizedValue)
+                {
+                    return;
+                }
+
+                _anhDaiDien = normalizedValue;
+                OnPropertyChanged(nameof(AnhDaiDien));
+                RefreshAvatarDisplay();
+            }
+        }
+
+        public ImageSource AvatarPath
+        {
+            get { return _avatarPath; }
+            private set
+            {
+                if (_avatarPath == value)
+                {
+                    return;
+                }
+
+                _avatarPath = value;
+                OnPropertyChanged(nameof(AvatarPath));
+            }
+        }
+
+        public string AvatarInitials
+        {
+            get { return _avatarInitials; }
+            private set
+            {
+                if (_avatarInitials == value)
+                {
+                    return;
+                }
+
+                _avatarInitials = value;
+                OnPropertyChanged(nameof(AvatarInitials));
+            }
+        }
+
+        public Visibility AvatarImageVisibility
+        {
+            get { return _avatarImageVisibility; }
+            private set
+            {
+                if (_avatarImageVisibility == value)
+                {
+                    return;
+                }
+
+                _avatarImageVisibility = value;
+                OnPropertyChanged(nameof(AvatarImageVisibility));
+            }
+        }
+
+        public Visibility AvatarInitialsVisibility
+        {
+            get { return _avatarInitialsVisibility; }
+            private set
+            {
+                if (_avatarInitialsVisibility == value)
+                {
+                    return;
+                }
+
+                _avatarInitialsVisibility = value;
+                OnPropertyChanged(nameof(AvatarInitialsVisibility));
             }
         }
 
@@ -217,6 +308,7 @@ namespace CoffeeTea.ViewModels
             if (!CanEditProfile)
             {
                 ErrorMessage = "Không xác định được tài khoản đang đăng nhập.";
+                AnhDaiDien = AvatarDisplayService.DefaultAvatarRelativePath;
                 return;
             }
 
@@ -231,6 +323,7 @@ namespace CoffeeTea.ViewModels
                     if (user == null)
                     {
                         ErrorMessage = "Không tìm thấy thông tin tài khoản trong cơ sở dữ liệu.";
+                        AnhDaiDien = AvatarDisplayService.DefaultAvatarRelativePath;
                         return;
                     }
 
@@ -240,11 +333,15 @@ namespace CoffeeTea.ViewModels
                     Email = user.Email;
                     Address = user.DiaChi;
                     RoleName = user.VaiTro != null ? user.VaiTro.TenVaiTro : "Không xác định";
+                    AnhDaiDien = string.IsNullOrWhiteSpace(user.AnhDaiDien)
+                        ? AvatarDisplayService.DefaultAvatarRelativePath
+                        : user.AnhDaiDien;
                 }
             }
             catch (Exception)
             {
                 ErrorMessage = "Không thể tải thông tin tài khoản. Vui lòng kiểm tra kết nối dữ liệu.";
+                AnhDaiDien = AvatarDisplayService.DefaultAvatarRelativePath;
             }
         }
 
@@ -279,6 +376,9 @@ namespace CoffeeTea.ViewModels
                     user.SoDienThoai = NormalizeNullable(PhoneNumber);
                     user.Email = NormalizeNullable(Email);
                     user.DiaChi = NormalizeNullable(Address);
+                    user.AnhDaiDien = string.IsNullOrWhiteSpace(AnhDaiDien)
+                        ? AvatarDisplayService.DefaultAvatarRelativePath
+                        : AnhDaiDien;
 
                     context.SaveChanges();
                 }
@@ -288,6 +388,63 @@ namespace CoffeeTea.ViewModels
             catch (Exception)
             {
                 ErrorMessage = "Không thể cập nhật hồ sơ. Vui lòng thử lại.";
+            }
+        }
+
+        private void ExecuteSelectAvatar()
+        {
+            ClearMessages();
+
+            if (!CanEditProfile)
+            {
+                ErrorMessage = "Không xác định được tài khoản để chọn ảnh đại diện.";
+                return;
+            }
+
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "Chọn ảnh đại diện",
+                Filter = "Ảnh đại diện (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png",
+                Multiselect = false,
+                CheckFileExists = true
+            };
+
+            if (openFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            string sourceFilePath = openFileDialog.FileName;
+            string extension = Path.GetExtension(sourceFilePath);
+            if (!IsAllowedImageExtension(extension))
+            {
+                ErrorMessage = "Chỉ được chọn file ảnh .jpg, .jpeg hoặc .png.";
+                return;
+            }
+
+            try
+            {
+                string destinationDirectory = AvatarDisplayService.ResolveApplicationPath(AvatarDisplayService.EmployeeAvatarRelativeFolder);
+                Directory.CreateDirectory(destinationDirectory);
+
+                string fileName = BuildEmployeeAvatarFileName(extension);
+                string relativePath = AvatarDisplayService.EmployeeAvatarRelativeFolder + "/" + fileName;
+                string destinationFilePath = AvatarDisplayService.ResolveApplicationPath(relativePath);
+
+                if (!string.Equals(
+                    Path.GetFullPath(sourceFilePath),
+                    Path.GetFullPath(destinationFilePath),
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Copy(sourceFilePath, destinationFilePath, true);
+                }
+
+                AnhDaiDien = relativePath;
+                SuccessMessage = "Đã chọn ảnh đại diện. Nhấn Lưu thông tin để lưu vào hồ sơ.";
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Không thể sao chép ảnh đại diện. Vui lòng chọn file ảnh khác.";
             }
         }
 
@@ -353,6 +510,71 @@ namespace CoffeeTea.ViewModels
             {
                 ErrorMessage = "Không thể đổi mật khẩu. Vui lòng thử lại.";
             }
+        }
+
+        private void RefreshAvatarDisplay()
+        {
+            string relativePath = string.IsNullOrWhiteSpace(AnhDaiDien)
+                ? AvatarDisplayService.DefaultAvatarRelativePath
+                : AnhDaiDien;
+
+            string absolutePath = AvatarDisplayService.ResolveAvatarPath(relativePath);
+
+            ImageSource imageSource = AvatarDisplayService.LoadAvatarImage(absolutePath);
+            if (imageSource != null)
+            {
+                AvatarPath = imageSource;
+                AvatarImageVisibility = Visibility.Visible;
+                AvatarInitialsVisibility = Visibility.Collapsed;
+                return;
+            }
+
+            AvatarPath = null;
+            AvatarImageVisibility = Visibility.Collapsed;
+            AvatarInitialsVisibility = Visibility.Visible;
+            UpdateAvatarInitials();
+        }
+
+        private void UpdateAvatarInitials()
+        {
+            AvatarInitials = BuildInitials(FullName);
+        }
+
+        private string BuildEmployeeAvatarFileName(string extension)
+        {
+            string safeEmployeeId = string.Join("_", _maNhanVien.Split(Path.GetInvalidFileNameChars()));
+            return safeEmployeeId + extension.ToLowerInvariant();
+        }
+
+        private static string BuildInitials(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                return "?";
+            }
+
+            string[] parts = fullName
+                .Trim()
+                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 0)
+            {
+                return "?";
+            }
+
+            if (parts.Length == 1)
+            {
+                return parts[0].Substring(0, 1).ToUpperInvariant();
+            }
+
+            return (parts[0].Substring(0, 1) + parts[parts.Length - 1].Substring(0, 1)).ToUpperInvariant();
+        }
+
+        private static bool IsAllowedImageExtension(string extension)
+        {
+            return string.Equals(extension, ".jpg", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(extension, ".jpeg", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(extension, ".png", StringComparison.OrdinalIgnoreCase);
         }
 
         private void ClearMessages()
