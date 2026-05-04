@@ -88,9 +88,14 @@ namespace CoffeeTea.Services
             {
                 UpdateBrushColor(app, item.Key, item.Value);
             }
+
+            UpdateBrushColor(app, SystemColors.ControlTextBrushKey, themeBrushes["Brush.TextPrimary"]);
+            UpdateBrushColor(app, SystemColors.GrayTextBrushKey, themeBrushes["Brush.TextSecondary"]);
+            UpdateBrushColor(app, SystemColors.HighlightBrushKey, themeBrushes["Brush.Primary"]);
+            UpdateBrushColor(app, SystemColors.HighlightTextBrushKey, themeBrushes["Brush.TextWhite"]);
         }
 
-        private static void UpdateBrushColor(Application app, string key, string colorHex)
+        private static void UpdateBrushColor(Application app, object key, string colorHex)
         {
             if (app == null)
             {
@@ -102,7 +107,7 @@ namespace CoffeeTea.Services
             ReplaceBrushInDictionaries(app.Resources, key, replacementBrush);
         }
 
-        private static bool ReplaceBrushInDictionaries(ResourceDictionary dictionary, string key, SolidColorBrush replacementBrush)
+        private static bool ReplaceBrushInDictionaries(ResourceDictionary dictionary, object key, SolidColorBrush replacementBrush)
         {
             if (dictionary == null)
             {
