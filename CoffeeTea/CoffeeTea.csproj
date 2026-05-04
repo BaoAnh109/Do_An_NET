@@ -177,9 +177,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>QLCoffeeTeaModel.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\sysdiagram.cs">
-      <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\VaiTro.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
@@ -191,11 +188,14 @@
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\DashboardViewModel.cs" />
     <Compile Include="ViewModels\DrinkViewModel.cs" />
+    <Compile Include="ViewModels\ImportReceiptViewModel.cs" />
+    <Compile Include="ViewModels\InventoryViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ProfileViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\SupplierViewModel.cs" />
     <Compile Include="Views\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
