@@ -6,7 +6,134 @@
              xmlns:local="clr-namespace:CoffeeTea.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+	<Grid Margin="16">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="6*"/>
+			<ColumnDefinition Width="4*"/>
+		</Grid.ColumnDefinitions>
+
+		<!-- Phần 1: Danh sách thực đơn -->
+		<Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,16,0">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+				<TextBlock Grid.Row="0" Text="Thực đơn" Style="{StaticResource SectionTitleTextStyle}" Margin="0,0,0,12"/>
+
+				<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,12">
+					<ItemsControl ItemsSource="{Binding Categories}" Margin="0 0 0 10">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Orientation="Horizontal"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Button Content="{Binding TenDanhMuc}"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        Command="{Binding DataContext.FilterByCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding MaDanhMuc}"/>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+
+				<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+					<ItemsControl ItemsSource="{Binding MenuItems}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Button Style="{StaticResource BaseButtonStyle}"
+                                        Width="140" Height="100" Margin="4" Padding="8"
+                                        Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+									<StackPanel VerticalAlignment="Center">
+										<TextBlock Text="{Binding TenMon}" TextWrapping="Wrap" TextAlignment="Center" FontWeight="Bold"/>
+										<TextBlock Text="{Binding DonGia, StringFormat={}{0:N0} đ}" Foreground="{DynamicResource Brush.TextSecondary}" TextAlignment="Center" Margin="0,8,0,0"/>
+									</StackPanel>
+								</Button>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+			</Grid>
+		</Border>
+
+		<Border Grid.Column="1" Style="{StaticResource CardStyle}">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+
+				<TextBlock Grid.Row="0" Text="Chi tiết Order" Style="{StaticResource SectionTitleTextStyle}" Margin="0,0,0,12"/>
+
+				<Grid Grid.Row="1" Margin="0,0,0,12">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<TextBlock Grid.Column="0" Text="Chọn bàn:" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox Grid.Column="1" Style="{StaticResource DatComboBoxStyle}" ItemsSource="{Binding AvailableTables}" SelectedItem="{Binding SelectedTable}" Margin="0">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TenBan}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+				<DataGrid Grid.Row="2" Style="{StaticResource AppDataGridStyle}" ItemsSource="{Binding CartItems}">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        </Style>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                        <Grid Background="{TemplateBinding Background}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+						<DataGridTextColumn Header="Tên món" Binding="{Binding TenMon}" Width="*" />
+						<DataGridTextColumn Header="SL" Binding="{Binding SoLuong}" Width="40" />
+						<DataGridTextColumn Header="Thành tiền" Binding="{Binding ThanhTien, StringFormat={}{0:N0}}" Width="80" />
+					</DataGrid.Columns>
+				</DataGrid>
+
+				<!-- Tổng kết và Thanh toán -->
+				<StackPanel Grid.Row="3" Margin="0,12,0,0">
+					<Grid Margin="0,0,0,12">
+						<TextBlock Text="Tổng cộng:" Style="{StaticResource SectionTitleTextStyle}" HorizontalAlignment="Left"/>
+						<TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} VNĐ}" Style="{StaticResource TitleTextStyle}" Foreground="{DynamicResource Brush.Danger}" FontSize="20" HorizontalAlignment="Right"/>
+					</Grid>
+
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="10"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<Button Grid.Column="0" Content="Hủy bỏ" Style="{StaticResource DangerButtonStyle}" Height="45" Command="{Binding ClearOrderCommand}"/>
+						<Button Grid.Column="2" Content="Thanh toán" Style="{StaticResource SuccessButtonStyle}" Height="45" Command="{Binding ProceedToPaymentCommand}"/>
+					</Grid>
+				</StackPanel>
+			</Grid>
+		</Border>
+	</Grid>
 </UserControl>
