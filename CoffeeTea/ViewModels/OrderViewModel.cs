@@ -44,10 +44,20 @@ namespace CoffeeTea.ViewModels
             set { _selectedTable = value; OnPropertyChanged(nameof(SelectedTable)); UpdateCommandStates(); }
         }
 
+        private CartItemModel _selectedCartItem;
+        public CartItemModel SelectedCartItem
+        {
+            get => _selectedCartItem;
+            set { _selectedCartItem = value; OnPropertyChanged(nameof(SelectedCartItem)); UpdateCommandStates(); }
+        }
+
         public decimal TotalAmount => CartItems.Sum(x => x.ThanhTien);
 
         public ICommand FilterByCategoryCommand { get; }
         public ICommand AddToCartCommand { get; }
+        public ICommand IncreaseQuantityCommand { get; }
+        public ICommand DecreaseQuantityCommand { get; }
+        public ICommand RemoveSelectedItemCommand { get; }
         public ICommand ClearOrderCommand { get; }
         public ICommand ProceedToPaymentCommand { get; }
 
@@ -66,6 +76,9 @@ namespace CoffeeTea.ViewModels
 
             FilterByCategoryCommand = new RelayCommand(param => FilterMenu(param as string));
             AddToCartCommand = new RelayCommand(param => AddToCart(param as Mon));
+            IncreaseQuantityCommand = new RelayCommand(param => ChangeQuantity(param as CartItemModel, 1), param => param is CartItemModel);
+            DecreaseQuantityCommand = new RelayCommand(param => ChangeQuantity(param as CartItemModel, -1), param => CanDecreaseQuantity(param as CartItemModel));
+            RemoveSelectedItemCommand = new RelayCommand(_ => RemoveSelectedItem(), _ => SelectedCartItem != null);
             ClearOrderCommand = new RelayCommand(_ => ClearOrder(), _ => CartItems.Any() || SelectedTable != null);
             ProceedToPaymentCommand = new RelayCommand(_ => ProceedToPayment(), _ => SelectedTable != null && CartItems.Any());
         }
@@ -102,12 +115,41 @@ namespace CoffeeTea.ViewModels
                 CartItems.Add(new CartItemModel { MonInfo = item, SoLuong = 1 });
             }
             OnPropertyChanged(nameof(TotalAmount));
+            UpdateCommandStates();
+        }
+
+        private void ChangeQuantity(CartItemModel item, int amount)
+        {
+            if (item == null) return;
+
+            int newQuantity = item.SoLuong + amount;
+            if (newQuantity < 1) return;
+
+            item.SoLuong = newQuantity;
+            OnPropertyChanged(nameof(TotalAmount));
+            UpdateCommandStates();
+        }
+
+        private bool CanDecreaseQuantity(CartItemModel item)
+        {
+            return item != null && item.SoLuong > 1;
+        }
+
+        private void RemoveSelectedItem()
+        {
+            if (SelectedCartItem == null) return;
+
+            CartItems.Remove(SelectedCartItem);
+            SelectedCartItem = null;
+            OnPropertyChanged(nameof(TotalAmount));
+            UpdateCommandStates();
         }
 
         private void ClearOrder()
         {
             CartItems.Clear();
             SelectedTable = null;
+            SelectedCartItem = null;
             UpdateCommandStates();
         }
         private void ProceedToPayment()
@@ -126,6 +168,9 @@ namespace CoffeeTea.ViewModels
         }
         private void UpdateCommandStates()
         {
+            (IncreaseQuantityCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            (DecreaseQuantityCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            (RemoveSelectedItemCommand as RelayCommand)?.RaiseCanExecuteChanged();
             (ClearOrderCommand as RelayCommand)?.RaiseCanExecuteChanged();
             (ProceedToPaymentCommand as RelayCommand)?.RaiseCanExecuteChanged();
         }

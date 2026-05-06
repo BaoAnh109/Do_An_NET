@@ -92,7 +92,10 @@
                     </ComboBox>
                 </Grid>
 
-				<DataGrid Grid.Row="2" Style="{StaticResource AppDataGridStyle}" ItemsSource="{Binding CartItems}">
+				<DataGrid Grid.Row="2"
+						  Style="{StaticResource AppDataGridStyle}"
+						  ItemsSource="{Binding CartItems}"
+						  SelectedItem="{Binding SelectedCartItem, Mode=TwoWay}">
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -111,8 +114,36 @@
                     </DataGrid.Resources>
                     <DataGrid.Columns>
 						<DataGridTextColumn Header="Tên món" Binding="{Binding TenMon}" Width="*" />
-						<DataGridTextColumn Header="SL" Binding="{Binding SoLuong}" Width="40" />
-						<DataGridTextColumn Header="Thành tiền" Binding="{Binding ThanhTien, StringFormat={}{0:N0}}" Width="80" />
+						<DataGridTemplateColumn Header="SL" Width="110">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+										<Button Content="-"
+												Style="{StaticResource BaseButtonStyle}"
+												Width="28"
+												Height="28"
+												Padding="0"
+												Margin="0"
+												Command="{Binding DataContext.DecreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+												CommandParameter="{Binding}"/>
+										<TextBlock Text="{Binding SoLuong}"
+												   Width="32"
+												   TextAlignment="Center"
+												   VerticalAlignment="Center"
+												   FontWeight="SemiBold"/>
+										<Button Content="+"
+												Style="{StaticResource BaseButtonStyle}"
+												Width="28"
+												Height="28"
+												Padding="0"
+												Margin="0"
+												Command="{Binding DataContext.IncreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+												CommandParameter="{Binding}"/>
+									</StackPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTextColumn Header="Thành tiền" Binding="{Binding ThanhTien, StringFormat={}{0:N0}}" Width="90" />
 					</DataGrid.Columns>
 				</DataGrid>
 
@@ -128,9 +159,12 @@
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="10"/>
 							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="10"/>
+							<ColumnDefinition Width="*"/>
 						</Grid.ColumnDefinitions>
 						<Button Grid.Column="0" Content="Hủy bỏ" Style="{StaticResource DangerButtonStyle}" Height="45" Command="{Binding ClearOrderCommand}"/>
-						<Button Grid.Column="2" Content="Thanh toán" Style="{StaticResource SuccessButtonStyle}" Height="45" Command="{Binding ProceedToPaymentCommand}"/>
+						<Button Grid.Column="2" Content="Xóa món" Style="{StaticResource DangerButtonStyle}" Height="45" Command="{Binding RemoveSelectedItemCommand}"/>
+						<Button Grid.Column="4" Content="Thanh toán" Style="{StaticResource SuccessButtonStyle}" Height="45" Command="{Binding ProceedToPaymentCommand}"/>
 					</Grid>
 				</StackPanel>
 			</Grid>
