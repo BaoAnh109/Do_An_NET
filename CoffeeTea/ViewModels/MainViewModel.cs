@@ -40,7 +40,13 @@ namespace CoffeeTea.ViewModels
             _categoryCommand = new RelayCommand(_ => CurrentView = new UCCategoryManagement(), _ => CanAccessCatalogMenu);
             _staffCommand = new RelayCommand(_ => CurrentView = new UCStaffManagement(), _ => CanAccessCatalogMenu);
             _supplierCommand = new RelayCommand(_ => CurrentView = new UCSupplierManagement(), _ => CanAccessCatalogMenu);
-            _orderCommand = new RelayCommand(_ => CurrentView = new UCOrder(), _ => CanAccessSalesMenu);
+            _orderCommand = new RelayCommand(_ =>
+            {
+                var orderVM = new OrderViewModel(ChuyenSangManHinhThanhToan, _authenticatedUser);
+
+                var orderView = new UCOrder { DataContext = orderVM };
+                CurrentView = orderView;
+            }, _ => CanAccessSalesMenu);
             _paymentCommand = new RelayCommand(_ => CurrentView = new UCPayment(), _ => CanAccessSalesMenu);
             _tableStatusCommand = new RelayCommand(_ => CurrentView = new UCTableStatus(), _ => CanAccessSalesMenu);
             _importCommand = new RelayCommand(_ => CurrentView = new UCImportReceipt(), _ => CanAccessWarehouseMenu);
@@ -212,6 +218,20 @@ namespace CoffeeTea.ViewModels
             CanAccessStatisticsMenu = isAdmin || isManager;
             CanAccessSystemMenu = true;
             CanAccessSettings = true;
+        }
+
+        private void ChuyenSangManHinhThanhToan(InvoiceDetailModel invoiceData)
+        {
+            var paymentVM = new PaymentViewModel(invoiceData, QuayVeManHinhOrder);
+
+            var paymentView = new UCPayment { DataContext = paymentVM };
+            CurrentView = paymentView;
+        }
+        private void QuayVeManHinhOrder()
+        {
+            var orderVM = new OrderViewModel(ChuyenSangManHinhThanhToan, _authenticatedUser);
+            var orderView = new UCOrder { DataContext = orderVM };
+            CurrentView = orderView;
         }
     }
 }
