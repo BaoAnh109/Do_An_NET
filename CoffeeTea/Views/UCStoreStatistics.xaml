@@ -16,10 +16,10 @@
 		<Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
 			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 				<TextBlock Text="Từ ngày:" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <DatePicker Language="vi-VN" Style="{StaticResource DatDatePickerStyle}" SelectedDate="{Binding FromDate}" Margin="0,0,24,0"/>
+				<DatePicker Language="vi-VN" Style="{StaticResource AppDatePickerStyle}" SelectedDate="{Binding FromDate}" Margin="0,0,24,0"/>
 
 				<TextBlock Text="Đến ngày:" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <DatePicker Language="vi-VN" Style="{StaticResource DatDatePickerStyle}" SelectedDate="{Binding ToDate}" Margin="0,0,24,0"/>
+				<DatePicker Language="vi-VN" Style="{StaticResource AppDatePickerStyle}" SelectedDate="{Binding ToDate}" Margin="0,0,24,0"/>
 
 				<Button Content="Lọc dữ liệu" Style="{StaticResource PrimaryButtonStyle}" Height="38" Margin="0" Command="{Binding FilterCommand}"/>
 				<Button Content="Xuất Report" Style="{StaticResource SuccessButtonStyle}" Height="38" Margin="12,0,0,0" Command="{Binding ExportReportCommand}"/>

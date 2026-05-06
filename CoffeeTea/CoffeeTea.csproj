@@ -185,14 +185,11 @@
     <Compile Include="Models\SoftwareSettingsModel.cs" />
     <Compile Include="Services\AvatarDisplayService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
-<<<<<<< Updated upstream
     <Compile Include="ViewModels\CategoryViewModel.cs" />
-=======
     <Compile Include="ViewModels\TableStatusViewModel.cs" />
     <Compile Include="ViewModels\StatisticsViewModel.cs" />
     <Compile Include="ViewModels\PaymentViewModel.cs" />
     <Compile Include="ViewModels\OrderViewModel.cs" />
->>>>>>> Stashed changes
     <Compile Include="ViewModels\DashboardViewModel.cs" />
     <Compile Include="ViewModels\DrinkViewModel.cs" />
     <Compile Include="ViewModels\ImportReceiptViewModel.cs" />
@@ -380,8 +377,4 @@
   </Target>
   <Import Project="..\packages\SkiaSharp.NativeAssets.Win32.3.119.2\build\net462\SkiaSharp.NativeAssets.Win32.targets" Condition="Exists('..\packages\SkiaSharp.NativeAssets.Win32.3.119.2\build\net462\SkiaSharp.NativeAssets.Win32.targets')" />
   <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.targets')" />
-<<<<<<< Updated upstream
 </Project>
-=======
-</Project>
->>>>>>> Stashed changes

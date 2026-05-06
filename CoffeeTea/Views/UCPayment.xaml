@@ -56,7 +56,7 @@
 					</Grid>
 
 					<TextBlock Text="Phương thức thanh toán" Style="{StaticResource LabelTextStyle}"/>
-					<ComboBox Style="{StaticResource DatComboBoxStyle}" ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding SelectedPaymentMethod}"/>
+					<ComboBox Style="{StaticResource AppComboBoxStyle}" ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding SelectedPaymentMethod}"/>
 
 					<TextBlock Text="Tiền khách đưa (VNĐ)" Style="{StaticResource LabelTextStyle}"/>
 					<TextBox Style="{StaticResource AppTextBoxStyle}" Text="{Binding CustomerGivenAmount, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" Foreground="{DynamicResource Brush.PrimaryDark}"/>

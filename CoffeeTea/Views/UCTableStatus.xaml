@@ -23,7 +23,7 @@
 
 				<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
 					<TextBlock Text="Khu vực:" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-					<ComboBox Style="{StaticResource DatComboBoxStyle}" Width="150" Margin="0"
+					<ComboBox Style="{StaticResource AppComboBoxStyle}" Width="150" Margin="0"
                               ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}"/>
 				</StackPanel>
 
