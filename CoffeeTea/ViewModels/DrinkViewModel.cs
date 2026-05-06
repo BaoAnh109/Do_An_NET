@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using System.Data.Entity;
+using System.Collections.Generic;
 
 namespace CoffeeTea.ViewModels
 {
@@ -59,6 +60,27 @@ namespace CoffeeTea.ViewModels
                 _donGia = value;
                 OnPropertyChanged("DonGia");
             }
+        }
+        private List<Mon> _allDrinksList;
+        private ObservableCollection<DanhMucMon> _filterCategories;
+        public ObservableCollection<DanhMucMon> FilterCategories
+        {
+            get { return _filterCategories; }
+            set { _filterCategories = value; OnPropertyChanged("FilterCategories"); }
+        }
+
+        private string _searchText;
+        public string SearchText
+        {
+            get { return _searchText; }
+            set { _searchText = value; OnPropertyChanged("SearchText"); ExecuteFilter(); }
+        }
+
+        private DanhMucMon _selectedFilterCategory;
+        public DanhMucMon SelectedFilterCategory
+        {
+            get { return _selectedFilterCategory; }
+            set { _selectedFilterCategory = value; OnPropertyChanged("SelectedFilterCategory"); ExecuteFilter(); }
         }
 
         private DanhMucMon _selectedCategoryInForm;
@@ -154,8 +176,13 @@ namespace CoffeeTea.ViewModels
 
         public void LoadData()
         {
-            Drinks = new ObservableCollection<Mon>(db.Mons.Include(m => m.DanhMucMon).ToList());
+            var list = db.Mons.Include(m => m.DanhMucMon).ToList();
+            _allDrinksList = list;
             Categories = new ObservableCollection<DanhMucMon>(db.DanhMucMons.ToList());
+            var tempFilter = new ObservableCollection<DanhMucMon>(Categories);
+            tempFilter.Insert(0, new DanhMucMon { TenDanhMuc = "Tất cả", MaDanhMuc = "" });
+            FilterCategories = tempFilter;
+            ExecuteFilter();
         }
 
         private void ClearInputs()
@@ -181,6 +208,20 @@ namespace CoffeeTea.ViewModels
             {
                 return "M" + (db.Mons.Count() + 1).ToString("D2");
             }
+        }
+        public void ExecuteFilter()
+        {
+            if (_allDrinksList == null) return;
+            var result = _allDrinksList.AsEnumerable();
+            if (!string.IsNullOrEmpty(SearchText))
+            {
+                result = result.Where(x => x.TenMon.ToLower().Contains(SearchText.ToLower()));
+            }
+            if (SelectedFilterCategory != null && SelectedFilterCategory.TenDanhMuc != "Tất cả")
+            {
+                result = result.Where(x => x.MaDanhMuc == SelectedFilterCategory.MaDanhMuc);
+            }
+            Drinks = new ObservableCollection<Mon>(result.ToList());
         }
     }
 }

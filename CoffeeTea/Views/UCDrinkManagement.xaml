@@ -9,11 +9,28 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
 
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="QUẢN LÝ MÓN ĂN" Style="{StaticResource TitleTextStyle}" Margin="0,0,0,15"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10,0,0,15">
+            <StackPanel Margin="0,0,15,0">
+                <TextBlock Text="Tìm kiếm tên món" Style="{StaticResource LabelTextStyle}" />
+                <TextBox Width="250" Style="{StaticResource AppTextBoxStyle}" 
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="Nhập tên món..."/>
+            </StackPanel>
+
+            <StackPanel Margin="0,0,15,0">
+                <TextBlock Text="Lọc theo danh mục" Style="{StaticResource LabelTextStyle}"/>
+                <ComboBox Width="150" Style="{StaticResource AppComboBoxStyle}"
+                          ItemsSource="{Binding FilterCategories}" 
+                          DisplayMemberPath="TenDanhMuc"
+                          SelectedItem="{Binding SelectedFilterCategory}"/>
+            </StackPanel>
+        </StackPanel>
 
         <Border Grid.Row="1" Style="{StaticResource CardStyle}" Background="{StaticResource Brush.Sidebar}" Padding="15" Margin="0,0,0,15">
             <StackPanel Orientation="Horizontal">
@@ -48,7 +65,7 @@
             </StackPanel>
         </Border>
 
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                 CornerRadius="{StaticResource Radius.Medium}"
                 BorderThickness="1"
                 BorderBrush="{DynamicResource Brush.BorderSoft}"
