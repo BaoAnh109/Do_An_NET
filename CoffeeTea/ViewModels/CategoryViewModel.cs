@@ -1,5 +1,6 @@
 ﻿using CoffeeTea.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -55,6 +56,19 @@ namespace CoffeeTea.ViewModels
             {
                 _moTa = value;
                 OnPropertyChanged("MoTa"); 
+            }
+        }
+        private List<DanhMucMon> _allCategoriesList; 
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged("SearchText");
+                ExecuteFilter(); 
             }
         }
 
@@ -130,12 +144,27 @@ namespace CoffeeTea.ViewModels
             }
         }
 
-        void LoadData() => Categories = new ObservableCollection<DanhMucMon>(db.DanhMucMons.ToList());
+        void LoadData()
+        {
+            var list = db.DanhMucMons.ToList();
+            _allCategoriesList = list;
+            ExecuteFilter();
+        }
         void ClearInput()
         {
             TenDanhMuc = "";
             MoTa = "";
             SelectedCategory = null;
+        }
+        public void ExecuteFilter()
+        {
+            if (_allCategoriesList == null) return;
+            var result = _allCategoriesList.AsEnumerable();
+            if (!string.IsNullOrEmpty(SearchText))
+            {
+                result = result.Where(x => x.TenDanhMuc.ToLower().Contains(SearchText.ToLower()));
+            }
+            Categories = new ObservableCollection<DanhMucMon>(result.ToList());
         }
     }
 }
