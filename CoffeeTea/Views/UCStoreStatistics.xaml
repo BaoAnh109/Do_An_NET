@@ -68,22 +68,6 @@
 				<TextBlock Grid.Row="0" Text="Danh sách hóa đơn" Style="{StaticResource SectionTitleTextStyle}" Margin="0,0,0,12"/>
 
 				<DataGrid Grid.Row="1" Style="{StaticResource AppDataGridStyle}" ItemsSource="{Binding Invoices}">
-                    <DataGrid.Resources>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                        </Style>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <Grid Background="{TemplateBinding Background}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGrid.Resources>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Mã HĐ" Binding="{Binding MaHoaDon}" Width="70" />
                         <DataGridTextColumn Header="Ngày lập" Binding="{Binding NgayLap, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="140" />
@@ -92,6 +76,21 @@
                         <DataGridTextColumn Header="Phương thức" Binding="{Binding PhuongThucTT}" Width="100" />
                         <DataGridTextColumn Header="Tổng tiền" Binding="{Binding TongTien, StringFormat={}{0:N0}}" Width="1*" />
                         <DataGridTextColumn Header="Trạng thái" Binding="{Binding TrangThai}" Width="100" />
+                        <DataGridTemplateColumn Header="Thao tác" Width="145">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Xem hóa đơn"
+                                            Width="126"
+                                            Height="32"
+                                            Padding="8,0"
+                                            Margin="0"
+                                            FontSize="13"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Command="{Binding DataContext.ViewInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 			</Grid>

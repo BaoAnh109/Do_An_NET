@@ -117,11 +117,6 @@
                                 </Button>
 
                                 <Button Style="{StaticResource SidebarButtonStyle}"
-                                        Command="{Binding PaymentCommand}">
-                                    <TextBlock Text="• Thanh toán"/>
-                                </Button>
-
-                                <Button Style="{StaticResource SidebarButtonStyle}"
                                         Command="{Binding TableStatusCommand}">
                                     <TextBlock Text="• Trạng thái bàn"/>
                                 </Button>

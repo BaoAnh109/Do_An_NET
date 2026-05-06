@@ -25,6 +25,9 @@
 					<TextBlock Text="Khu vực:" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
 					<ComboBox Style="{StaticResource AppComboBoxStyle}" Width="150" Margin="0"
                               ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}"/>
+					<TextBlock Text="Trạng thái:" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center" Margin="16,0,10,0"/>
+					<ComboBox Style="{StaticResource AppComboBoxStyle}" Width="170" Margin="0"
+                              ItemsSource="{Binding StatusFilters}" SelectedItem="{Binding SelectedStatus}"/>
 				</StackPanel>
 
 				<StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">

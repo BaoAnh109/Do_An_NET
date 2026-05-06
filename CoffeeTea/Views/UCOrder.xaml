@@ -6,6 +6,22 @@
              xmlns:local="clr-namespace:CoffeeTea.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<Style x:Key="CategoryFilterButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+			<Setter Property="MinWidth" Value="90"/>
+			<Setter Property="Background" Value="{DynamicResource Brush.Card}"/>
+			<Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource Brush.BorderSoft}"/>
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding IsSelected}" Value="True">
+					<Setter Property="Background" Value="{DynamicResource Brush.Primary}"/>
+					<Setter Property="Foreground" Value="{DynamicResource Brush.TextWhite}"/>
+					<Setter Property="BorderBrush" Value="{DynamicResource Brush.PrimaryDark}"/>
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+	</UserControl.Resources>
+
 	<Grid Margin="16">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="6*"/>
@@ -33,7 +49,7 @@
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
 								<Button Content="{Binding TenDanhMuc}"
-                                        Style="{StaticResource BaseButtonStyle}"
+                                        Style="{StaticResource CategoryFilterButtonStyle}"
                                         Command="{Binding DataContext.FilterByCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding MaDanhMuc}"/>
 							</DataTemplate>
@@ -96,22 +112,6 @@
 						  Style="{StaticResource AppDataGridStyle}"
 						  ItemsSource="{Binding CartItems}"
 						  SelectedItem="{Binding SelectedCartItem, Mode=TwoWay}">
-                    <DataGrid.Resources>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                        </Style>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                        <Grid Background="{TemplateBinding Background}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </DataGrid.Resources>
                     <DataGrid.Columns>
 						<DataGridTextColumn Header="Tên món" Binding="{Binding TenMon}" Width="*" />
 						<DataGridTemplateColumn Header="SL" Width="110">
@@ -164,7 +164,7 @@
 						</Grid.ColumnDefinitions>
 						<Button Grid.Column="0" Content="Hủy bỏ" Style="{StaticResource DangerButtonStyle}" Height="45" Command="{Binding ClearOrderCommand}"/>
 						<Button Grid.Column="2" Content="Xóa món" Style="{StaticResource DangerButtonStyle}" Height="45" Command="{Binding RemoveSelectedItemCommand}"/>
-						<Button Grid.Column="4" Content="Thanh toán" Style="{StaticResource SuccessButtonStyle}" Height="45" Command="{Binding ProceedToPaymentCommand}"/>
+						<Button Grid.Column="4" Content="Lập hóa đơn" Style="{StaticResource SuccessButtonStyle}" Height="45" Command="{Binding CreateInvoiceCommand}"/>
 					</Grid>
 				</StackPanel>
 			</Grid>

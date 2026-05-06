@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Data.Entity;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using CoffeeTea.Models;
 using CoffeeTea.Views;
@@ -40,18 +44,12 @@ namespace CoffeeTea.ViewModels
             _categoryCommand = new RelayCommand(_ => CurrentView = new UCCategoryManagement(), _ => CanAccessCatalogMenu);
             _staffCommand = new RelayCommand(_ => CurrentView = new UCStaffManagement(), _ => CanAccessCatalogMenu);
             _supplierCommand = new RelayCommand(_ => CurrentView = new UCSupplierManagement(), _ => CanAccessCatalogMenu);
-            _orderCommand = new RelayCommand(_ =>
-            {
-                var orderVM = new OrderViewModel(ChuyenSangManHinhThanhToan, _authenticatedUser);
-
-                var orderView = new UCOrder { DataContext = orderVM };
-                CurrentView = orderView;
-            }, _ => CanAccessSalesMenu);
+            _orderCommand = new RelayCommand(_ => ChuyenSangManHinhOrder(), _ => CanAccessSalesMenu);
             _paymentCommand = new RelayCommand(_ => CurrentView = new UCPayment(), _ => CanAccessSalesMenu);
-            _tableStatusCommand = new RelayCommand(_ => CurrentView = new UCTableStatus(), _ => CanAccessSalesMenu);
+            _tableStatusCommand = new RelayCommand(_ => ChuyenSangManHinhTrangThaiBan(), _ => CanAccessSalesMenu);
             _importCommand = new RelayCommand(_ => CurrentView = new UCImportReceipt(), _ => CanAccessWarehouseMenu);
             _inventoryCommand = new RelayCommand(_ => CurrentView = new UCInventory(), _ => CanAccessWarehouseMenu);
-            _revenueReportCommand = new RelayCommand(_ => CurrentView = new UCStoreStatistics(), _ => CanAccessStatisticsMenu);
+            _revenueReportCommand = new RelayCommand(_ => ChuyenSangManHinhThongKe(), _ => CanAccessStatisticsMenu);
             _profileCommand = new RelayCommand(_ => CurrentView = new UCProfile(_authenticatedUser), _ => CanAccessSystemMenu);
             _settingsCommand = new RelayCommand(_ => CurrentView = new UCSettings(_authenticatedUser), _ => CanAccessSettings);
             _logoutCommand = new RelayCommand(_ => _logoutAction?.Invoke());
@@ -220,18 +218,121 @@ namespace CoffeeTea.ViewModels
             CanAccessSettings = true;
         }
 
-        private void ChuyenSangManHinhThanhToan(InvoiceDetailModel invoiceData)
-        {
-            var paymentVM = new PaymentViewModel(invoiceData, QuayVeManHinhOrder);
-
-            var paymentView = new UCPayment { DataContext = paymentVM };
-            CurrentView = paymentView;
-        }
         private void QuayVeManHinhOrder()
         {
-            var orderVM = new OrderViewModel(ChuyenSangManHinhThanhToan, _authenticatedUser);
+            var orderVM = new OrderViewModel(ChuyenSangManHinhTrangThaiBan, _authenticatedUser);
             var orderView = new UCOrder { DataContext = orderVM };
             CurrentView = orderView;
+        }
+
+        private void ChuyenSangManHinhOrder(Ban selectedTable = null)
+        {
+            var orderVM = new OrderViewModel(ChuyenSangManHinhTrangThaiBan, _authenticatedUser, selectedTable);
+            var orderView = new UCOrder { DataContext = orderVM };
+            CurrentView = orderView;
+        }
+
+        private void ChuyenSangManHinhTrangThaiBan()
+        {
+            var tableStatusVM = new TableStatusViewModel(ChuyenSangManHinhOrder, ChuyenSangThanhToanTheoBan);
+            CurrentView = new UCTableStatus(tableStatusVM);
+        }
+
+        private void ChuyenSangThanhToanTheoBan(Ban table)
+        {
+            InvoiceDetailModel invoiceData = TaoHoaDonThanhToanTuBan(table);
+            if (invoiceData == null)
+            {
+                MessageBox.Show($"Không tìm thấy hóa đơn chưa thanh toán của {table.TenBan}.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var paymentVM = new PaymentViewModel(invoiceData, ChuyenSangManHinhTrangThaiBan);
+            CurrentView = new UCPayment { DataContext = paymentVM };
+        }
+
+        private InvoiceDetailModel TaoHoaDonThanhToanTuBan(Ban table)
+        {
+            if (table == null) return null;
+
+            using (var context = new QL_CoffeeTeaEntities())
+            {
+                var invoice = context.HoaDons
+                    .Include(h => h.Ban)
+                    .Include(h => h.ChiTietHoaDons.Select(ct => ct.Mon))
+                    .Where(h => h.MaBan == table.MaBan && h.TrangThai == "Chưa thanh toán")
+                    .OrderByDescending(h => h.NgayLap)
+                    .FirstOrDefault();
+
+                if (invoice == null) return null;
+
+                return TaoChiTietHoaDonThanhToan(invoice, table.TenBan);
+            }
+        }
+
+        private void ChuyenSangThanhToanTheoHoaDon(HoaDon selectedInvoice)
+        {
+            if (selectedInvoice == null) return;
+
+            InvoiceDetailModel invoiceData = TaoHoaDonThanhToanTuMaHoaDon(selectedInvoice.MaHoaDon);
+            if (invoiceData == null)
+            {
+                MessageBox.Show("Không tìm thấy dữ liệu chi tiết của hóa đơn.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var paymentVM = new PaymentViewModel(invoiceData, ChuyenSangManHinhThongKe);
+            CurrentView = new UCPayment { DataContext = paymentVM };
+        }
+
+        private InvoiceDetailModel TaoHoaDonThanhToanTuMaHoaDon(string maHoaDon)
+        {
+            if (string.IsNullOrWhiteSpace(maHoaDon)) return null;
+
+            using (var context = new QL_CoffeeTeaEntities())
+            {
+                var invoice = context.HoaDons
+                    .Include(h => h.Ban)
+                    .Include(h => h.ChiTietHoaDons.Select(ct => ct.Mon))
+                    .FirstOrDefault(h => h.MaHoaDon == maHoaDon);
+
+                if (invoice == null) return null;
+
+                return TaoChiTietHoaDonThanhToan(invoice);
+            }
+        }
+
+        private InvoiceDetailModel TaoChiTietHoaDonThanhToan(HoaDon invoice, string fallbackTableName = null)
+        {
+            var items = invoice.ChiTietHoaDons
+                .Select(detail => new CartItemModel
+                {
+                    MonInfo = detail.Mon,
+                    TenMon = detail.Mon != null ? detail.Mon.TenMon : detail.MaMon,
+                    DonGia = detail.DonGia,
+                    SoLuong = detail.SoLuong
+                })
+                .ToList();
+
+            decimal total = invoice.TongTien > 0 ? invoice.TongTien : items.Sum(item => item.ThanhTien);
+
+            return new InvoiceDetailModel
+            {
+                MaHoaDon = invoice.MaHoaDon,
+                TenBan = invoice.Ban != null ? invoice.Ban.TenBan : fallbackTableName,
+                MaBan = invoice.MaBan,
+                MaNhanVien = invoice.MaNhanVien,
+                PhuongThucTT = invoice.PhuongThucTT,
+                TrangThai = invoice.TrangThai,
+                NgayLap = invoice.NgayLap,
+                TongTien = total,
+                Items = new ObservableCollection<CartItemModel>(items)
+            };
+        }
+
+        private void ChuyenSangManHinhThongKe()
+        {
+            CurrentView = new UCStoreStatistics(ChuyenSangThanhToanTheoHoaDon);
         }
     }
 }

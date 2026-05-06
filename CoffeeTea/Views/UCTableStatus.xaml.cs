@@ -26,5 +26,11 @@ namespace CoffeeTea.Views
             InitializeComponent();
             this.DataContext = new TableStatusViewModel();
         }
+
+        public UCTableStatus(TableStatusViewModel viewModel)
+        {
+            InitializeComponent();
+            this.DataContext = viewModel;
+        }
     }
 }

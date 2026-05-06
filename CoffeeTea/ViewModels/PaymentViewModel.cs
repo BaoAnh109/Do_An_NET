@@ -12,16 +12,20 @@ namespace CoffeeTea.ViewModels
 {
     public class InvoiceDetailModel
     {
+        public string MaHoaDon { get; set; }
         public string TenBan { get; set; }
         public DateTime NgayLap { get; set; }
         public decimal TongTien { get; set; }
         public ObservableCollection<CartItemModel> Items { get; set; }
         public string MaBan { get; set; }     
-        public string MaNhanVien { get; set; }  
+        public string MaNhanVien { get; set; }
+        public string PhuongThucTT { get; set; }
+        public string TrangThai { get; set; }
     }
     public class PaymentViewModel : BaseViewModel
     {
-        private readonly Action _onCancelAction;
+        private readonly Action _goBackAction;
+        private bool _isPaid;
         public InvoiceDetailModel InvoiceDetails { get; set; }
         public ObservableCollection<string> PaymentMethods { get; set; }
 
@@ -52,23 +56,45 @@ namespace CoffeeTea.ViewModels
                 return 0;
             }
         }
+        public bool IsPaid
+        {
+            get => _isPaid;
+            set
+            {
+                if (_isPaid == value) return;
+
+                _isPaid = value;
+                OnPropertyChanged(nameof(IsPaid));
+                OnPropertyChanged(nameof(CanEditPayment));
+                OnPropertyChanged(nameof(PaymentStatusText));
+                (ConfirmPaymentCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            }
+        }
+
+        public bool CanEditPayment => !IsPaid;
+
+        public string PaymentStatusText => IsPaid ? "Đã thanh toán" : "Chờ thanh toán";
+
         public ICommand CancelCommand { get; }
         public ICommand ConfirmPaymentCommand { get; }
 
-        public PaymentViewModel(InvoiceDetailModel invoice, Action onCancelAction = null)
+        public PaymentViewModel(InvoiceDetailModel invoice, Action goBackAction = null)
         {
             InvoiceDetails = invoice;
-            _onCancelAction = onCancelAction;
+            _goBackAction = goBackAction;
 
             PaymentMethods = new ObservableCollection<string> { "Tiền mặt", "Chuyển khoản", "Thẻ tín dụng" };
-            SelectedPaymentMethod = "Tiền mặt";
+            SelectedPaymentMethod = !string.IsNullOrWhiteSpace(invoice.PhuongThucTT) ? invoice.PhuongThucTT : "Tiền mặt";
+            IsPaid = string.Equals(invoice.TrangThai, "Đã thanh toán", StringComparison.OrdinalIgnoreCase);
 
             CancelCommand = new RelayCommand(_ => CancelPayment());
-            ConfirmPaymentCommand = new RelayCommand(_ => ConfirmPayment());
+            ConfirmPaymentCommand = new RelayCommand(_ => ConfirmPayment(), _ => !IsPaid);
         }
 
         private void ConfirmPayment()
         {
+            if (IsPaid) return;
+
             if (!decimal.TryParse(CustomerGivenAmount, out decimal givenAmount))
             {
                 MessageBox.Show("Thanh toán không thành công! Vui lòng nhập số tiền hợp lệ.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -84,35 +110,37 @@ namespace CoffeeTea.ViewModels
             {
                 using (var context = new QL_CoffeeTeaEntities())
                 {
-                    int hdCount = context.HoaDons.Count() + 1;
-                    string maHD = "HD" + hdCount.ToString("D4");
-                    var hoaDonMoi = new HoaDon
+                    string maHD = InvoiceDetails.MaHoaDon;
+                    if (string.IsNullOrEmpty(maHD))
                     {
-                        MaHoaDon = maHD,
-                        NgayLap = DateTime.Now,
-                        MaBan = InvoiceDetails.MaBan,
-                        MaNhanVien = InvoiceDetails.MaNhanVien,
-                        TongTien = InvoiceDetails.TongTien,
-                        PhuongThucTT = SelectedPaymentMethod,
-                        TrangThai = "Đã thanh toán",
-                        GhiChu = ""
-                    };
-                    context.HoaDons.Add(hoaDonMoi);
-                    int cthdCount = context.ChiTietHoaDons.Count() + 1;
-                    foreach (var item in InvoiceDetails.Items)
-                    {
-                        var chiTiet = new ChiTietHoaDon
-                        {
-                            MaCTHD = "CT" + cthdCount.ToString("D5"),
-                            MaHoaDon = maHD,
-                            MaMon = item.MonInfo.MaMon,
-                            SoLuong = item.SoLuong,
-                            DonGia = item.DonGia,
-                            GhiChu = ""
-                        };
-                        context.ChiTietHoaDons.Add(chiTiet);
-                        cthdCount++;
+                        MessageBox.Show("Không có hóa đơn đang phục vụ để thanh toán.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
                     }
+
+                    HoaDon hoaDon = context.HoaDons.FirstOrDefault(h => h.MaHoaDon == maHD);
+                    if (hoaDon == null)
+                    {
+                        MessageBox.Show("Không tìm thấy hóa đơn trong CSDL.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    hoaDon.MaBan = InvoiceDetails.MaBan;
+                    hoaDon.MaNhanVien = InvoiceDetails.MaNhanVien;
+                    hoaDon.TongTien = InvoiceDetails.TongTien;
+                    hoaDon.PhuongThucTT = SelectedPaymentMethod;
+                    hoaDon.TrangThai = "Đã thanh toán";
+                    InvoiceDetails.MaHoaDon = maHD;
+                    InvoiceDetails.PhuongThucTT = SelectedPaymentMethod;
+                    InvoiceDetails.TrangThai = "Đã thanh toán";
+
+                    if (!string.IsNullOrEmpty(InvoiceDetails.MaHoaDon))
+                    {
+                        foreach (var detail in context.ChiTietHoaDons.Where(ct => ct.MaHoaDon == maHD))
+                        {
+                            detail.ThanhTien = detail.SoLuong * detail.DonGia;
+                        }
+                    }
+
                     var ban = context.Bans.FirstOrDefault(b => b.MaBan == InvoiceDetails.MaBan);
                     if (ban != null)
                     {
@@ -126,8 +154,7 @@ namespace CoffeeTea.ViewModels
                 MessageBox.Show($"Thanh toán thành công {InvoiceDetails.TongTien:N0} VNĐ qua {SelectedPaymentMethod}!",
                                 "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            
-                _onCancelAction?.Invoke();
+                IsPaid = true;
             }
             catch (Exception ex)
             {
@@ -136,12 +163,7 @@ namespace CoffeeTea.ViewModels
         }
         private void CancelPayment()
         {
-            MessageBox.Show("Đã hủy quá trình thanh toán. Quay về màn hình Lập hóa đơn.",
-                            "Thông báo",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
-
-            _onCancelAction?.Invoke();
+            _goBackAction?.Invoke();
         }
     }
 }

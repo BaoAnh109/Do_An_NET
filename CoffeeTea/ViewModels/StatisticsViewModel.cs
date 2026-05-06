@@ -10,19 +10,55 @@ namespace CoffeeTea.ViewModels
 {
     public class StatisticsViewModel : BaseViewModel
     {
+        private readonly Action<HoaDon> _openInvoiceAction;
         private QL_CoffeeTeaEntities _context = new QL_CoffeeTeaEntities();
         private DateTime _fromDate = DateTime.Now.Date.AddDays(-30); 
         public DateTime FromDate
         {
             get => _fromDate;
-            set { _fromDate = value; OnPropertyChanged(nameof(FromDate)); }
+            set
+            {
+                DateTime newDate = value.Date;
+                bool wasClamped = false;
+                if (newDate > ToDate)
+                {
+                    newDate = ToDate;
+                    wasClamped = true;
+                }
+
+                if (_fromDate == newDate)
+                {
+                    if (wasClamped)
+                    {
+                        OnPropertyChanged(nameof(FromDate));
+                    }
+
+                    return;
+                }
+
+                _fromDate = newDate;
+                OnPropertyChanged(nameof(FromDate));
+            }
         }
 
         private DateTime _toDate = DateTime.Now.Date;
         public DateTime ToDate
         {
             get => _toDate;
-            set { _toDate = value; OnPropertyChanged(nameof(ToDate)); }
+            set
+            {
+                DateTime newDate = value.Date;
+                if (_toDate == newDate) return;
+
+                _toDate = newDate;
+                OnPropertyChanged(nameof(ToDate));
+
+                if (FromDate > _toDate)
+                {
+                    _fromDate = _toDate;
+                    OnPropertyChanged(nameof(FromDate));
+                }
+            }
         }
 
         private ObservableCollection<HoaDon> _invoices;
@@ -38,11 +74,14 @@ namespace CoffeeTea.ViewModels
 
         public ICommand FilterCommand { get; }
         public ICommand ExportReportCommand { get; }
+        public ICommand ViewInvoiceCommand { get; }
 
-        public StatisticsViewModel()
+        public StatisticsViewModel(Action<HoaDon> openInvoiceAction = null)
         {
+            _openInvoiceAction = openInvoiceAction;
             FilterCommand = new RelayCommand(_ => LoadStatistics());
             ExportReportCommand = new RelayCommand(_ => ExportToExcel());
+            ViewInvoiceCommand = new RelayCommand(invoice => ViewInvoice(invoice as HoaDon), invoice => invoice is HoaDon);
             LoadStatistics();
         }
 
@@ -67,6 +106,17 @@ namespace CoffeeTea.ViewModels
         {
 
             MessageBox.Show("Chức năng xuất Report nâng cao đang được xử lý...");
+        }
+
+        private void ViewInvoice(HoaDon invoice)
+        {
+            if (invoice == null)
+            {
+                MessageBox.Show("Vui lòng chọn hóa đơn cần xem.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            _openInvoiceAction?.Invoke(invoice);
         }
     }
 }

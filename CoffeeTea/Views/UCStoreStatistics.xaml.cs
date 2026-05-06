@@ -22,9 +22,14 @@ namespace CoffeeTea.Views
     public partial class UCStoreStatistics : UserControl
     {
         public UCStoreStatistics()
+            : this(null)
+        {
+        }
+
+        public UCStoreStatistics(Action<CoffeeTea.Models.HoaDon> openInvoiceAction)
         {
             InitializeComponent();
-            this.DataContext = new StatisticsViewModel();
+            this.DataContext = new StatisticsViewModel(openInvoiceAction);
         }
     }
 }
