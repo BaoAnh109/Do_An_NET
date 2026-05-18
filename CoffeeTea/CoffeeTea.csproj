@@ -201,6 +201,7 @@
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StaffViewModel.cs" />
     <Compile Include="ViewModels\SupplierViewModel.cs" />
+    <Compile Include="ViewModels\TableManagementViewModel.cs" />
     <Compile Include="Views\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
@@ -242,6 +243,9 @@
     </Compile>
     <Compile Include="Views\UCSupplierManagement.xaml.cs">
       <DependentUpon>UCSupplierManagement.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UCTableManagement.xaml.cs">
+      <DependentUpon>UCTableManagement.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UCTableStatus.xaml.cs">
       <DependentUpon>UCTableStatus.xaml</DependentUpon>
@@ -340,6 +344,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\UCSupplierManagement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UCTableManagement.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

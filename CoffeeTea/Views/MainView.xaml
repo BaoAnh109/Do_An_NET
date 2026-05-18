@@ -95,6 +95,11 @@
                                 </Button>
 
                                 <Button Style="{StaticResource SidebarButtonStyle}"
+                                        Command="{Binding TableManagementCommand}">
+                                    <TextBlock Text="• Quản lý bàn"/>
+                                </Button>
+
+                                <Button Style="{StaticResource SidebarButtonStyle}"
                                         Command="{Binding StaffCommand}">
                                     <TextBlock Text="• Nhân viên"/>
                                 </Button>

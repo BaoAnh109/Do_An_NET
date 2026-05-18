@@ -18,6 +18,7 @@ namespace CoffeeTea.ViewModels
         private ICommand _dashboardCommand;
         private ICommand _drinkCommand;
         private ICommand _categoryCommand;
+        private ICommand _tableManagementCommand;
         private ICommand _staffCommand;
         private ICommand _supplierCommand;
         private ICommand _orderCommand;
@@ -42,6 +43,7 @@ namespace CoffeeTea.ViewModels
             _dashboardCommand = new RelayCommand(_ => CurrentView = new UCDashboardView(_authenticatedUser), _ => CanAccessSalesMenu);
             _drinkCommand = new RelayCommand(_ => CurrentView = new UCDrinkManagement(), _ => CanAccessCatalogMenu);
             _categoryCommand = new RelayCommand(_ => CurrentView = new UCCategoryManagement(), _ => CanAccessCatalogMenu);
+            _tableManagementCommand = new RelayCommand(_ => CurrentView = new UCTableManagement(), _ => CanAccessCatalogMenu);
             _staffCommand = new RelayCommand(_ => CurrentView = new UCStaffManagement(), _ => CanAccessCatalogMenu);
             _supplierCommand = new RelayCommand(_ => CurrentView = new UCSupplierManagement(), _ => CanAccessCatalogMenu);
             _orderCommand = new RelayCommand(_ => ChuyenSangManHinhOrder(), _ => CanAccessSalesMenu);
@@ -109,6 +111,11 @@ namespace CoffeeTea.ViewModels
         public ICommand CategoryCommand
         {
             get { return _categoryCommand; }
+        }
+
+        public ICommand TableManagementCommand
+        {
+            get { return _tableManagementCommand; }
         }
 
         public ICommand StaffCommand
