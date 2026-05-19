@@ -196,7 +196,7 @@
                               RowHeaderWidth="0"
                               HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header=" STT"
+                                <DataGridTextColumn Header="STT"
                                                 Binding="{Binding LineNo}"
                                                 Width="55"/>
                                 <DataGridTextColumn Header="Mã món"
@@ -267,7 +267,7 @@
                               RowHeaderWidth="0"
                               HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header=" Mã phiếu"
+                                <DataGridTextColumn Header="Mã phiếu"
                                                 Binding="{Binding ReceiptId}"
                                                 Width="130"/>
                                 <DataGridTextColumn Header="Ngày nhập"

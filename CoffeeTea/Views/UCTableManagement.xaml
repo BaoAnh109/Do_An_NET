@@ -164,7 +164,7 @@
                               RowHeaderWidth="0"
                               HeadersVisibility="Column">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header=" Mã bàn"
+                            <DataGridTextColumn Header="Mã bàn"
                                                 Binding="{Binding MaBan}"
                                                 Width="90"/>
                             <DataGridTextColumn Header="Tên bàn"

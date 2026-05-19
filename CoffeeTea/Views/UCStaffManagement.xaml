@@ -235,12 +235,12 @@
                               HeadersVisibility="Column"
                               HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header=" Mã NV"
+                            <DataGridTextColumn Header="Mã NV"
                                                 Binding="{Binding EmployeeId}"
                                                 Width="90"/>
                             <DataGridTextColumn Header="Họ tên"
                                                 Binding="{Binding FullName}"
-                                                Width="180"/>
+                                                Width="150"/>
                             <DataGridTextColumn Header="Giới tính"
                                                 Binding="{Binding Gender}"
                                                 Width="90"/>

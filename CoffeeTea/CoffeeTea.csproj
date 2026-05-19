@@ -200,6 +200,7 @@
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StaffViewModel.cs" />
+    <Compile Include="ViewModels\StatisticsReportData.cs" />
     <Compile Include="ViewModels\SupplierViewModel.cs" />
     <Compile Include="ViewModels\TableManagementViewModel.cs" />
     <Compile Include="Views\LoginView.xaml.cs">
@@ -240,6 +241,9 @@
     </Compile>
     <Compile Include="Views\UCStoreStatistics.xaml.cs">
       <DependentUpon>UCStoreStatistics.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StoreStatisticsReportWindow.xaml.cs">
+      <DependentUpon>StoreStatisticsReportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UCSupplierManagement.xaml.cs">
       <DependentUpon>UCSupplierManagement.xaml</DependentUpon>
@@ -340,6 +344,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\UCStoreStatistics.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StoreStatisticsReportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

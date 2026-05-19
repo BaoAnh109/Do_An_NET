@@ -26,5 +26,6 @@ namespace CoffeeTea.Views
             InitializeComponent();
             DataContext = new StaffViewModel();
         }
+        
     }
 }

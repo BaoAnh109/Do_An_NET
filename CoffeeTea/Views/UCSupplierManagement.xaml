@@ -226,7 +226,7 @@
                               RowHeaderWidth="0"
                               HeadersVisibility="Column">     
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header=" Mã NCC"
+                                <DataGridTextColumn Header="Mã NCC"
                                                 Binding="{Binding SupplierId}"
                                                 Width="90"/>
                                 <DataGridTextColumn Header="Tên nhà cung cấp"

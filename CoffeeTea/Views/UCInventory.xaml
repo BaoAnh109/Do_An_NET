@@ -162,7 +162,7 @@
                           RowHeaderWidth="0"
                           HeadersVisibility="Column">             
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header=" Mã"
+                            <DataGridTextColumn Header="Mã"
                                             Binding="{Binding DrinkId}"
                                             Width="80"/>
                             <DataGridTextColumn Header="Tên món / vật tư"

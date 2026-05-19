@@ -1,18 +1,7 @@
 ﻿using CoffeeTea.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CoffeeTea.Views
 {
@@ -29,7 +18,17 @@ namespace CoffeeTea.Views
         public UCStoreStatistics(Action<CoffeeTea.Models.HoaDon> openInvoiceAction)
         {
             InitializeComponent();
-            this.DataContext = new StatisticsViewModel(openInvoiceAction);
+            this.DataContext = new StatisticsViewModel(openInvoiceAction, OpenReportWindow);
+        }
+
+        private void OpenReportWindow(StatisticsReportData reportData)
+        {
+            var window = new StoreStatisticsReportWindow(reportData)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            window.ShowDialog();
         }
     }
 }

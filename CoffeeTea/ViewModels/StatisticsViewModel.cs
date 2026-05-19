@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ namespace CoffeeTea.ViewModels
     public class StatisticsViewModel : BaseViewModel
     {
         private readonly Action<HoaDon> _openInvoiceAction;
+        private readonly Action<StatisticsReportData> _openReportAction;
         private QL_CoffeeTeaEntities _context = new QL_CoffeeTeaEntities();
         private DateTime _fromDate = DateTime.Now.Date.AddDays(-30); 
         public DateTime FromDate
@@ -76,11 +78,12 @@ namespace CoffeeTea.ViewModels
         public ICommand ExportReportCommand { get; }
         public ICommand ViewInvoiceCommand { get; }
 
-        public StatisticsViewModel(Action<HoaDon> openInvoiceAction = null)
+        public StatisticsViewModel(Action<HoaDon> openInvoiceAction = null, Action<StatisticsReportData> openReportAction = null)
         {
             _openInvoiceAction = openInvoiceAction;
+            _openReportAction = openReportAction;
             FilterCommand = new RelayCommand(_ => LoadStatistics());
-            ExportReportCommand = new RelayCommand(_ => ExportToExcel());
+            ExportReportCommand = new RelayCommand(_ => OpenReport(), _ => TotalInvoices > 0);
             ViewInvoiceCommand = new RelayCommand(invoice => ViewInvoice(invoice as HoaDon), invoice => invoice is HoaDon);
             LoadStatistics();
         }
@@ -100,12 +103,53 @@ namespace CoffeeTea.ViewModels
             OnPropertyChanged(nameof(TotalRevenue));
             OnPropertyChanged(nameof(TotalInvoices));
             OnPropertyChanged(nameof(AveragePerInvoice));
+            CommandManager.InvalidateRequerySuggested();
         }
 
-        private void ExportToExcel()
+        private void OpenReport()
         {
+            if (TotalInvoices == 0)
+            {
+                MessageBox.Show("Không có dữ liệu hóa đơn để lập report.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
-            MessageBox.Show("Chức năng xuất Report nâng cao đang được xử lý...");
+            if (_openReportAction == null)
+            {
+                MessageBox.Show("Chưa cấu hình màn hình xem report.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            _openReportAction(BuildReportData());
+        }
+
+        private StatisticsReportData BuildReportData()
+        {
+            var culture = CultureInfo.GetCultureInfo("vi-VN");
+            var items = Invoices
+                .Select((invoice, index) => new StatisticsReportInvoiceItem
+                {
+                    No = index + 1,
+                    InvoiceId = invoice.MaHoaDon,
+                    CreatedAt = invoice.NgayLap.ToString("dd/MM/yyyy HH:mm", culture),
+                    TableName = invoice.Ban?.TenBan ?? "",
+                    StaffName = invoice.NhanVien?.HoTen ?? "",
+                    PaymentMethod = invoice.PhuongThucTT ?? "",
+                    TotalAmount = invoice.TongTien,
+                    Status = invoice.TrangThai ?? ""
+                })
+                .ToList();
+
+            return new StatisticsReportData
+            {
+                FromDate = FromDate,
+                ToDate = ToDate,
+                GeneratedAt = DateTime.Now,
+                TotalRevenue = TotalRevenue,
+                TotalInvoices = TotalInvoices,
+                AveragePerInvoice = AveragePerInvoice,
+                Items = items
+            };
         }
 
         private void ViewInvoice(HoaDon invoice)
