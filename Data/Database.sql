@@ -1,6 +1,5 @@
 ﻿-- =============================================
 --  CSDL QUAN LY CoffeeTea
---  Muc tieu: de hoc, de dung, du chuc nang repo
 --  He QTCSDL: SQL Server
 -- =============================================
 
@@ -218,7 +217,6 @@ GO
 
 -- =============================================
 -- DU LIEU MAU
--- Moi bang it nhat 10 dong
 -- =============================================
 
 -- 1. VAI TRO
@@ -292,11 +290,11 @@ INSERT INTO Mon (MaMon, TenMon, MaDanhMuc, DonGia, DonViTinh, TrangThai, MoTa) V
 INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoChoNgoi, TrangThai) VALUES
 ('B01', N'Bàn 01', N'Tầng trệt', 2, N'Trống'),
 ('B02', N'Bàn 02', N'Tầng trệt', 2, N'Trống'),
-('B03', N'Bàn 03', N'Tầng trệt', 4, N'Đang phục vụ'),
+('B03', N'Bàn 03', N'Tầng trệt', 4, N'Trống'),
 ('B04', N'Bàn 04', N'Tầng trệt', 4, N'Trống'),
 ('B05', N'Bàn 05', N'Tầng trệt', 6, N'Đã đặt'),
 ('B06', N'Bàn 06', N'Lầu 1',     2, N'Trống'),
-('B07', N'Bàn 07', N'Lầu 1',     2, N'Đang phục vụ'),
+('B07', N'Bàn 07', N'Lầu 1',     2, N'Trống'),
 ('B08', N'Bàn 08', N'Lầu 1',     4, N'Trống'),
 ('B09', N'Bàn 09', N'Sân vườn',  4, N'Trống'),
 ('B10', N'Bàn 10', N'Sân vườn',  6, N'Bảo trì');
@@ -390,12 +388,7 @@ INSERT INTO ChiTietHoaDon (MaCTHD, MaHoaDon, MaMon, SoLuong, DonGia, GhiChu) VAL
 ('CTHD07', 'HD05', 'M10', 1, 47000, N''),
 ('CTHD08', 'HD05', 'M02', 1, 30000, N''),
 ('CTHD09', 'HD05', 'M01', 1, 25000, N''),
-('CTHD10', 'HD06', 'M08', 1, 35000, N'Không đá');
-GO
-
--- Them tiep 10 dong nua de bang ChiTietHoaDon co >= 10 dong la du,
--- o day da du 10 dong, nhung bo sung them vai dong de du lieu dep hon:
-INSERT INTO ChiTietHoaDon (MaCTHD, MaHoaDon, MaMon, SoLuong, DonGia, GhiChu) VALUES
+('CTHD10', 'HD06', 'M08', 1, 35000, N'Không đá'),
 ('CTHD11', 'HD07', 'M06', 2, 50000, N''),
 ('CTHD12', 'HD08', 'M09', 1, 38000, N''),
 ('CTHD13', 'HD08', 'M01', 1, 25000, N''),
