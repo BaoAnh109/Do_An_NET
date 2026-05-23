@@ -112,6 +112,12 @@ namespace CoffeeTea.ViewModels
          
             DeleteCommand = new RelayCommand(
                 (p) => {
+                    bool hasRelatedItems = db.Mons.Any(m => m.MaDanhMuc == SelectedCategory.MaDanhMuc);
+                    if (hasRelatedItems)
+                    {
+                        System.Windows.MessageBox.Show("Không thể xóa danh mục này vì có món liên quan.", "Lỗi", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                        return;
+                    }
                     var item = db.DanhMucMons.Find(SelectedCategory.MaDanhMuc);
                     if (item != null)
                     {
