@@ -14,18 +14,6 @@ namespace CoffeeTea.Models
 
         public string CloseTime { get; set; }
 
-        public bool EnableLowStockAlert { get; set; }
-
-        public decimal LowStockThreshold { get; set; }
-
-        public bool EnableAutoLock { get; set; }
-
-        public int AutoLockMinutes { get; set; }
-
-        public bool ConfirmBeforeExit { get; set; }
-
-        public bool EnableDailySummaryNotification { get; set; }
-
         public bool IsDarkTheme { get; set; }
 
         public string LastUpdatedBy { get; set; }
@@ -41,12 +29,6 @@ namespace CoffeeTea.Models
                 Hotline = "0901 000 001",
                 OpenTime = "06:30",
                 CloseTime = "22:30",
-                EnableLowStockAlert = true,
-                LowStockThreshold = 10,
-                EnableAutoLock = false,
-                AutoLockMinutes = 30,
-                ConfirmBeforeExit = true,
-                EnableDailySummaryNotification = true,
                 IsDarkTheme = false,
                 LastUpdatedBy = "Hệ thống",
                 LastUpdatedAt = DateTime.Now

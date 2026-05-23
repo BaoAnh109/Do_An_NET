@@ -89,61 +89,6 @@
                     </StackPanel>
                 </Grid>
             </Border>
-
-            <Border Style="{StaticResource CardStyle}"
-                    Margin="0,0,0,14"
-                    Visibility="{Binding CanEditSystemSettings, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="12"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="24"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Row="0" Grid.ColumnSpan="3">
-                        <TextBlock Text="Vận hành hệ thống"
-                                   Style="{StaticResource SectionTitleTextStyle}"/>
-                        <TextBlock Text="Cài đặt quản lý: tồn kho, tự khóa, xác nhận đăng xuất và thông báo cuối ngày."
-                                   Style="{StaticResource CaptionTextStyle}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,4,0,0"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="2" Grid.Column="0">
-                        <CheckBox Content="Bật cảnh báo tồn kho"
-                                  IsChecked="{Binding EnableLowStockAlert}"
-                                  Style="{StaticResource AppCheckBoxStyle}"/>
-
-                        <TextBlock Text="Ngưỡng cảnh báo tồn kho" Style="{StaticResource LabelTextStyle}"/>
-                        <TextBox Text="{Binding LowStockThreshold, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource AppTextBoxStyle}"/>
-
-                        <CheckBox Content="Bật thông báo tổng kết cuối ngày"
-                                  IsChecked="{Binding EnableDailySummaryNotification}"
-                                  Style="{StaticResource AppCheckBoxStyle}"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="2" Grid.Column="2">
-                        <CheckBox Content="Bật tự động khóa màn hình"
-                                  IsChecked="{Binding EnableAutoLock}"
-                                  Style="{StaticResource AppCheckBoxStyle}"/>
-
-                        <TextBlock Text="Thời gian tự khóa (phút)" Style="{StaticResource LabelTextStyle}"/>
-                        <TextBox Text="{Binding AutoLockMinutes, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource AppTextBoxStyle}"/>
-
-                        <CheckBox Content="Yêu cầu xác nhận khi đăng xuất"
-                                  IsChecked="{Binding ConfirmBeforeExit}"
-                                  Style="{StaticResource AppCheckBoxStyle}"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="Giao diện ứng dụng"

@@ -16,12 +16,6 @@ namespace CoffeeTea.ViewModels
         private string _hotline;
         private string _openTime;
         private string _closeTime;
-        private bool _enableLowStockAlert;
-        private decimal _lowStockThreshold;
-        private bool _enableAutoLock;
-        private int _autoLockMinutes;
-        private bool _confirmBeforeExit;
-        private bool _enableDailySummaryNotification;
         private bool _isDarkTheme;
         private string _lastUpdatedInformation;
         private string _successMessage;
@@ -136,96 +130,6 @@ namespace CoffeeTea.ViewModels
 
                 _closeTime = value;
                 OnPropertyChanged(nameof(CloseTime));
-            }
-        }
-
-        public bool EnableLowStockAlert
-        {
-            get { return _enableLowStockAlert; }
-            set
-            {
-                if (_enableLowStockAlert == value)
-                {
-                    return;
-                }
-
-                _enableLowStockAlert = value;
-                OnPropertyChanged(nameof(EnableLowStockAlert));
-            }
-        }
-
-        public decimal LowStockThreshold
-        {
-            get { return _lowStockThreshold; }
-            set
-            {
-                if (_lowStockThreshold == value)
-                {
-                    return;
-                }
-
-                _lowStockThreshold = value;
-                OnPropertyChanged(nameof(LowStockThreshold));
-            }
-        }
-
-        public bool EnableAutoLock
-        {
-            get { return _enableAutoLock; }
-            set
-            {
-                if (_enableAutoLock == value)
-                {
-                    return;
-                }
-
-                _enableAutoLock = value;
-                OnPropertyChanged(nameof(EnableAutoLock));
-            }
-        }
-
-        public int AutoLockMinutes
-        {
-            get { return _autoLockMinutes; }
-            set
-            {
-                if (_autoLockMinutes == value)
-                {
-                    return;
-                }
-
-                _autoLockMinutes = value;
-                OnPropertyChanged(nameof(AutoLockMinutes));
-            }
-        }
-
-        public bool ConfirmBeforeExit
-        {
-            get { return _confirmBeforeExit; }
-            set
-            {
-                if (_confirmBeforeExit == value)
-                {
-                    return;
-                }
-
-                _confirmBeforeExit = value;
-                OnPropertyChanged(nameof(ConfirmBeforeExit));
-            }
-        }
-
-        public bool EnableDailySummaryNotification
-        {
-            get { return _enableDailySummaryNotification; }
-            set
-            {
-                if (_enableDailySummaryNotification == value)
-                {
-                    return;
-                }
-
-                _enableDailySummaryNotification = value;
-                OnPropertyChanged(nameof(EnableDailySummaryNotification));
             }
         }
 
@@ -450,19 +354,6 @@ namespace CoffeeTea.ViewModels
                 ErrorMessage = "Giờ mở cửa phải nhỏ hơn giờ đóng cửa.";
                 return false;
             }
-
-            if (LowStockThreshold < 0)
-            {
-                ErrorMessage = "Ngưỡng cảnh báo tồn kho không được âm.";
-                return false;
-            }
-
-            if (AutoLockMinutes < 1 || AutoLockMinutes > 180)
-            {
-                ErrorMessage = "Thời gian tự động khóa phải từ 1 đến 180 phút.";
-                return false;
-            }
-
             return true;
         }
 
@@ -475,12 +366,6 @@ namespace CoffeeTea.ViewModels
                 Hotline = Normalize(Hotline),
                 OpenTime = Normalize(OpenTime),
                 CloseTime = Normalize(CloseTime),
-                EnableLowStockAlert = EnableLowStockAlert,
-                LowStockThreshold = LowStockThreshold,
-                EnableAutoLock = EnableAutoLock,
-                AutoLockMinutes = AutoLockMinutes,
-                ConfirmBeforeExit = ConfirmBeforeExit,
-                EnableDailySummaryNotification = EnableDailySummaryNotification,
                 IsDarkTheme = IsDarkTheme,
                 LastUpdatedBy = ResolveUpdatedBy(),
                 LastUpdatedAt = DateTime.Now
@@ -494,12 +379,6 @@ namespace CoffeeTea.ViewModels
             Hotline = settings.Hotline;
             OpenTime = settings.OpenTime;
             CloseTime = settings.CloseTime;
-            EnableLowStockAlert = settings.EnableLowStockAlert;
-            LowStockThreshold = settings.LowStockThreshold;
-            EnableAutoLock = settings.EnableAutoLock;
-            AutoLockMinutes = settings.AutoLockMinutes;
-            ConfirmBeforeExit = settings.ConfirmBeforeExit;
-            EnableDailySummaryNotification = settings.EnableDailySummaryNotification;
             IsDarkTheme = settings.IsDarkTheme;
         }
 
