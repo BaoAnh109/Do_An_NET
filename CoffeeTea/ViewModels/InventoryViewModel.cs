@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace CoffeeTea.ViewModels
@@ -20,6 +21,7 @@ namespace CoffeeTea.ViewModels
         private InventoryItem _selectedInventoryItem;
         private string _inventorySearchKeyword;
         private string _selectedStatusFilter;
+        private string _inventoryUpdateText;
         private string _minimumQuantityText;
 
         public InventoryViewModel()
@@ -29,7 +31,8 @@ namespace CoffeeTea.ViewModels
 
             RefreshInventoryCommand = new RelayCommand(_ => LoadInventory());
             ClearFilterCommand = new RelayCommand(_ => ClearFilter());
-            UpdateMinimumQuantityCommand = new RelayCommand(_ => UpdateMinimumQuantity(), _ => SelectedInventoryItem != null);
+            UpdateInventoryCommand = new RelayCommand(_ => UpdateInventory(), _ => SelectedInventoryItem != null);
+            UpdateMinimumQuantityCommand = UpdateInventoryCommand;
 
             LoadInventory();
         }
@@ -57,10 +60,12 @@ namespace CoffeeTea.ViewModels
 
                 if (_selectedInventoryItem != null)
                 {
+                    InventoryUpdateText = _selectedInventoryItem.Quantity.ToString("0.##");
                     MinimumQuantityText = _selectedInventoryItem.MinimumQuantity.ToString("0.##");
                 }
                 else
                 {
+                    InventoryUpdateText = string.Empty;
                     MinimumQuantityText = string.Empty;
                 }
 
@@ -96,6 +101,12 @@ namespace CoffeeTea.ViewModels
             set { _minimumQuantityText = value; OnPropertyChanged(nameof(MinimumQuantityText)); }
         }
 
+        public string InventoryUpdateText
+        {
+            get { return _inventoryUpdateText; }
+            set { _inventoryUpdateText = value; OnPropertyChanged(nameof(InventoryUpdateText)); }
+        }
+
         public string TotalInventoryValueText 
         { 
             get { return (InventoryItems != null ? InventoryItems.Sum(x => x.TotalValue) : 0).ToString("N0") + " đ"; } 
@@ -115,6 +126,7 @@ namespace CoffeeTea.ViewModels
 
         public ICommand RefreshInventoryCommand { get; private set; }
         public ICommand ClearFilterCommand { get; private set; }
+        public ICommand UpdateInventoryCommand { get; private set; }
         public ICommand UpdateMinimumQuantityCommand { get; private set; }
 
         private void LoadInventory()
@@ -180,11 +192,18 @@ namespace CoffeeTea.ViewModels
             ApplyFilter();
         }
 
-        private void UpdateMinimumQuantity()
+        private void UpdateInventory()
         {
             if (SelectedInventoryItem == null)
             {
                 MessageBox.Show("Bạn chưa chọn mặt hàng cần cập nhật.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            decimal inventoryQuantity;
+            if (!TryParseDecimal(InventoryUpdateText, out inventoryQuantity) || inventoryQuantity < 0)
+            {
+                MessageBox.Show("Số lượng tồn kho không hợp lệ.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -195,6 +214,8 @@ namespace CoffeeTea.ViewModels
                 return;
             }
 
+            
+
             try
             {
                 string selectedId = SelectedInventoryItem.DrinkId;
@@ -204,20 +225,27 @@ namespace CoffeeTea.ViewModels
                     MessageBox.Show("Không tìm thấy nguyên liệu cần cập nhật.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+                if(ingredient.SoLuongTon < inventoryQuantity)
+                {
+                    MessageBox.Show("Số lượng tồn bạn nhập lớn hơn số lượng có trong kho.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
+                ingredient.SoLuongTon = inventoryQuantity;
                 ingredient.MucCanhBao = minimumQuantity;
                 db.SaveChanges();
 
                 LoadInventory();
                 SelectedInventoryItem = InventoryItems.FirstOrDefault(x => x.DrinkId == selectedId);
 
-                MessageBox.Show("Đã cập nhật mức tồn tối thiểu.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Đã cập nhật tồn kho.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể cập nhật tồn tối thiểu: " + GetInnermostMessage(ex), "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Không thể cập nhật tồn kho: " + GetInnermostMessage(ex), "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private static bool TryParseDecimal(string value, out decimal result)
         {
