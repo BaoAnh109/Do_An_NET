@@ -5,11 +5,14 @@ using System.Linq;
 using System.Windows.Input;
 using System.Data.Entity;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace CoffeeTea.ViewModels
 {
     public class DrinkViewModel : BaseViewModel
     {
+        private const string ActiveStatus = "Đang bán";
+        private const string HiddenStatus = "Ngừng bán";
         private QL_CoffeeTeaEntities db = new QL_CoffeeTeaEntities();
 
         private ObservableCollection<Mon> _drinks;
@@ -129,7 +132,7 @@ namespace CoffeeTea.ViewModels
                          DonGia = DonGia ?? 0,
                          MaDanhMuc = SelectedCategoryInForm.MaDanhMuc,
                          DonViTinh = string.IsNullOrEmpty(DonViTinh) ? "Ly" : DonViTinh,
-                         TrangThai = "Đang bán"
+                         TrangThai = ActiveStatus
                       };
                          db.Mons.Add(newDrink);
                          db.SaveChanges();
@@ -162,8 +165,20 @@ namespace CoffeeTea.ViewModels
                     var drink = db.Mons.FirstOrDefault(x => x.MaMon == SelectedDrink.MaMon);
                     if (drink != null)
                     {
-                        db.Mons.Remove(drink);
+                        var result = MessageBox.Show(
+                            "Bạn chắc chắn muốn xóa món này?",
+                            "Xác nhận",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question);
+
+                        if (result != MessageBoxResult.Yes)
+                        {
+                            return;
+                        }
+
+                        drink.TrangThai = HiddenStatus;
                         db.SaveChanges();
+                        MessageBox.Show("Đã xoá món khỏi danh sách bán hàng.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
                         LoadData();
                         ClearInputs();
                         (DeleteCommand as RelayCommand)?.RaiseCanExecuteChanged();
@@ -176,7 +191,10 @@ namespace CoffeeTea.ViewModels
 
         public void LoadData()
         {
-            var list = db.Mons.Include(m => m.DanhMucMon).ToList();
+            var list = db.Mons
+                .Include(m => m.DanhMucMon)
+                .Where(m => m.TrangThai == ActiveStatus)
+                .ToList();
             _allDrinksList = list;
             Categories = new ObservableCollection<DanhMucMon>(db.DanhMucMons.ToList());
             var tempFilter = new ObservableCollection<DanhMucMon>(Categories);
