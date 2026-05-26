@@ -1,6 +1,7 @@
 using CoffeeTea.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -9,7 +10,7 @@ using System.Windows.Input;
 
 namespace CoffeeTea.ViewModels
 {
-    public class StaffViewModel : BaseViewModel
+    public class StaffViewModel : BaseViewModel, IDataErrorInfo
     {
         private const string DefaultAvatarPath = "Images/Employees/default-avatar.png";
 
@@ -142,6 +143,8 @@ namespace CoffeeTea.ViewModels
             {
                 _birthDate = value;
                 OnPropertyChanged(nameof(BirthDate));
+                OnPropertyChanged(nameof(StartDate));
+                RefreshCommands();
             }
         }
 
@@ -218,6 +221,8 @@ namespace CoffeeTea.ViewModels
             {
                 _startDate = value;
                 OnPropertyChanged(nameof(StartDate));
+                OnPropertyChanged(nameof(BirthDate));
+                RefreshCommands();
             }
         }
 
@@ -273,6 +278,29 @@ namespace CoffeeTea.ViewModels
         public ICommand UpdateCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
         public ICommand ClearCommand { get; private set; }
+
+        public string Error
+        {
+            get { return string.Empty; }
+        }
+
+        public string this[string columnName]
+        {
+            get
+            {
+                if (columnName == nameof(BirthDate))
+                {
+                    return ValidateBirthDate();
+                }
+
+                if (columnName == nameof(StartDate))
+                {
+                    return ValidateStartDate();
+                }
+
+                return string.Empty;
+            }
+        }
 
         private void LoadData()
         {
@@ -523,7 +551,8 @@ namespace CoffeeTea.ViewModels
                    && !string.IsNullOrWhiteSpace(Username)
                    && !string.IsNullOrWhiteSpace(Password)
                    && SelectedRole != null
-                   && TryParseSalary(out salary);
+                   && TryParseSalary(out salary)
+                   && !HasDateValidationError();
         }
 
         private bool ValidateStaffForm(out string message, out decimal salary)
@@ -572,6 +601,20 @@ namespace CoffeeTea.ViewModels
                 return false;
             }
 
+            string dateValidationMessage = ValidateBirthDate();
+            if (!string.IsNullOrWhiteSpace(dateValidationMessage))
+            {
+                message = dateValidationMessage;
+                return false;
+            }
+
+            dateValidationMessage = ValidateStartDate();
+            if (!string.IsNullOrWhiteSpace(dateValidationMessage))
+            {
+                message = dateValidationMessage;
+                return false;
+            }
+
             if (!string.IsNullOrWhiteSpace(Phone) && Phone.Trim().Length > 15)
             {
                 message = "Số điện thoại không được quá 15 ký tự.";
@@ -598,6 +641,56 @@ namespace CoffeeTea.ViewModels
 
             message = string.Empty;
             return true;
+        }
+
+        private bool HasDateValidationError()
+        {
+            return !string.IsNullOrWhiteSpace(ValidateBirthDate())
+                   || !string.IsNullOrWhiteSpace(ValidateStartDate());
+        }
+
+        private string ValidateBirthDate()
+        {
+            if (!BirthDate.HasValue)
+            {
+                return string.Empty;
+            }
+
+            DateTime birthDate = BirthDate.Value.Date;
+
+            if (birthDate >= DateTime.Today)
+            {
+                return "Ngày sinh phải nhỏ hơn ngày hiện tại.";
+            }
+
+            if (StartDate.HasValue && birthDate > StartDate.Value.Date)
+            {
+                return "Ngày sinh không được lớn hơn ngày vào làm.";
+            }
+
+            return string.Empty;
+        }
+
+        private string ValidateStartDate()
+        {
+            if (!StartDate.HasValue)
+            {
+                return "Bạn chưa chọn ngày vào làm.";
+            }
+
+            DateTime startDate = StartDate.Value.Date;
+
+            if (startDate > DateTime.Today)
+            {
+                return "Ngày vào làm không được lớn hơn ngày hiện tại.";
+            }
+
+            if (BirthDate.HasValue && startDate < BirthDate.Value.Date)
+            {
+                return "Ngày vào làm không được nhỏ hơn ngày sinh.";
+            }
+
+            return string.Empty;
         }
 
         private bool TryParseSalary(out decimal salary)

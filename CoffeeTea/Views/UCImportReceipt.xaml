@@ -71,7 +71,7 @@
 
                         <TextBlock Text="Ngày nhập"
                                Style="{StaticResource LabelTextStyle}"/>
-                        <DatePicker SelectedDate="{Binding ImportDate, Mode=TwoWay}"
+                        <DatePicker SelectedDate="{Binding ImportDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}"
                                 Style="{StaticResource AppDatePickerStyle}"/>
 
                         <TextBlock Text="Món / vật tư"

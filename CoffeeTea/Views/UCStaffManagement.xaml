@@ -101,7 +101,7 @@
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="Ngày sinh"
                                            Style="{StaticResource LabelTextStyle}"/>
-                                <DatePicker SelectedDate="{Binding BirthDate}"
+                                <DatePicker SelectedDate="{Binding BirthDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}"
                                             Language="vi-VN"
                                             Style="{StaticResource AppDatePickerStyle}"/>
                             </StackPanel>
@@ -161,7 +161,7 @@
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="Ngày vào làm"
                                            Style="{StaticResource LabelTextStyle}"/>
-                                <DatePicker SelectedDate="{Binding StartDate}"
+                                <DatePicker SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}"
                                             Language="vi-VN"
                                             Style="{StaticResource AppDatePickerStyle}"/>
                             </StackPanel>

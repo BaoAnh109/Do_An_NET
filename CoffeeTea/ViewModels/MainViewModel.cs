@@ -281,6 +281,7 @@ namespace CoffeeTea.ViewModels
         {
             if (selectedInvoice == null) return;
 
+            object previousStatisticsView = CurrentView;
             InvoiceDetailModel invoiceData = TaoHoaDonThanhToanTuMaHoaDon(selectedInvoice.MaHoaDon);
             if (invoiceData == null)
             {
@@ -288,8 +289,19 @@ namespace CoffeeTea.ViewModels
                 return;
             }
 
-            var paymentVM = new PaymentViewModel(invoiceData, ChuyenSangManHinhThongKe);
+            var paymentVM = new PaymentViewModel(invoiceData, () => QuayVeManHinhThongKe(previousStatisticsView));
             CurrentView = new UCPayment { DataContext = paymentVM };
+        }
+
+        private void QuayVeManHinhThongKe(object previousStatisticsView)
+        {
+            if (previousStatisticsView != null)
+            {
+                CurrentView = previousStatisticsView;
+                return;
+            }
+
+            ChuyenSangManHinhThongKe();
         }
 
         private InvoiceDetailModel TaoHoaDonThanhToanTuMaHoaDon(string maHoaDon)

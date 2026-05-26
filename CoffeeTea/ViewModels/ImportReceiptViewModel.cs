@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ using System.Windows.Input;
 
 namespace CoffeeTea.ViewModels
 {
-    public class ImportReceiptViewModel : BaseViewModel
+    public class ImportReceiptViewModel : BaseViewModel, IDataErrorInfo
     {
         private readonly QL_CoffeeTeaEntities db = new QL_CoffeeTeaEntities();
 
@@ -185,6 +186,24 @@ namespace CoffeeTea.ViewModels
         public ICommand ClearReceiptCommand { get; private set; }
         public ICommand RefreshReceiptCommand { get; private set; }
 
+        public string Error
+        {
+            get { return string.Empty; }
+        }
+
+        public string this[string columnName]
+        {
+            get
+            {
+                if (columnName == nameof(ImportDate))
+                {
+                    return ValidateImportDate();
+                }
+
+                return string.Empty;
+            }
+        }
+
         private decimal TotalAmount
         {
             get { return ImportDetails != null ? ImportDetails.Sum(x => x.LineTotal) : 0; }
@@ -306,7 +325,10 @@ namespace CoffeeTea.ViewModels
 
         private bool CanSaveReceipt()
         {
-            return SelectedSupplier != null && ImportDetails != null && ImportDetails.Count > 0;
+            return SelectedSupplier != null
+                   && ImportDetails != null
+                   && ImportDetails.Count > 0
+                   && string.IsNullOrWhiteSpace(ValidateImportDate());
         }
 
         private void SaveReceipt()
@@ -320,6 +342,13 @@ namespace CoffeeTea.ViewModels
             if (ImportDate == null)
             {
                 MessageBox.Show("Bạn chưa chọn ngày nhập.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            string importDateValidationMessage = ValidateImportDate();
+            if (!string.IsNullOrWhiteSpace(importDateValidationMessage))
+            {
+                MessageBox.Show(importDateValidationMessage, "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -406,6 +435,21 @@ namespace CoffeeTea.ViewModels
             }
             RefreshDetailSummary();
             RefreshCommands();
+        }
+
+        private string ValidateImportDate()
+        {
+            if (!ImportDate.HasValue)
+            {
+                return "Bạn chưa chọn ngày nhập.";
+            }
+
+            if (ImportDate.Value.Date > DateTime.Today)
+            {
+                return "Ngày nhập không được lớn hơn ngày hiện tại.";
+            }
+
+            return string.Empty;
         }
 
         private string ResolveEmployeeId()
