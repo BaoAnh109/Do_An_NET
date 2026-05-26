@@ -10,6 +10,7 @@ namespace CoffeeTea.ViewModels
 {
     public class TableManagementViewModel : BaseViewModel
     {
+        private const string ServingStatus = "Đang phục vụ";
         private readonly QL_CoffeeTeaEntities db = new QL_CoffeeTeaEntities();
         private List<Ban> _allTables = new List<Ban>();
 
@@ -278,6 +279,14 @@ namespace CoffeeTea.ViewModels
                     return;
                 }
 
+                if (IsServing(table.TrangThai))
+                {
+                    MessageBox.Show("Bàn đang phục vụ nên không thể sửa thông tin. Vui lòng thanh toán hoặc chuyển bàn về trạng thái phù hợp trước.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    LoadData();
+                    SelectedTable = Tables.FirstOrDefault(x => x.MaBan == id);
+                    return;
+                }
+
                 if (db.Bans.Any(x => x.MaBan != id && x.TenBan == normalizedName))
                 {
                     MessageBox.Show("Tên bàn đã tồn tại.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -318,6 +327,14 @@ namespace CoffeeTea.ViewModels
                 if (table == null)
                 {
                     MessageBox.Show("Không tìm thấy bàn cần xóa.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (IsServing(table.TrangThai))
+                {
+                    MessageBox.Show("Bàn đang phục vụ nên không thể xóa hoặc chuyển trạng thái. Vui lòng thanh toán trước.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    LoadData();
+                    SelectedTable = Tables.FirstOrDefault(x => x.MaBan == id);
                     return;
                 }
 
@@ -473,6 +490,11 @@ namespace CoffeeTea.ViewModels
         private static string SafeLower(string value)
         {
             return (value ?? string.Empty).ToLower();
+        }
+
+        private static bool IsServing(string status)
+        {
+            return string.Equals(status, ServingStatus, StringComparison.OrdinalIgnoreCase);
         }
 
         private static string GetInnermostMessage(Exception ex)
