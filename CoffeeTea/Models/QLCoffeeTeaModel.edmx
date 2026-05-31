@@ -15,6 +15,16 @@
           <Property Name="SoChoNgoi" Type="int" Nullable="false" />
           <Property Name="TrangThai" Type="nvarchar" MaxLength="30" Nullable="false" />
         </EntityType>
+        <EntityType Name="CongThucMon">
+          <Key>
+            <PropertyRef Name="MaCongThuc" />
+          </Key>
+          <Property Name="MaCongThuc" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="MaMon" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="MaNguyenLieu" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="SoLuongSuDung" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="GhiChu" Type="nvarchar" MaxLength="255" />
+        </EntityType>
         <EntityType Name="ChiTietHoaDon">
           <Key>
             <PropertyRef Name="MaCTHD" />
@@ -37,16 +47,6 @@
           <Property Name="SoLuong" Type="decimal" Precision="18" Scale="2" Nullable="false" />
           <Property Name="DonGiaNhap" Type="decimal" Precision="18" Scale="2" Nullable="false" />
           <Property Name="ThanhTien" Type="decimal" Precision="37" Scale="4" StoreGeneratedPattern="Computed" />
-        </EntityType>
-        <EntityType Name="CongThucMon">
-          <Key>
-            <PropertyRef Name="MaCongThuc" />
-          </Key>
-          <Property Name="MaCongThuc" Type="varchar" MaxLength="10" Nullable="false" />
-          <Property Name="MaMon" Type="varchar" MaxLength="10" Nullable="false" />
-          <Property Name="MaNguyenLieu" Type="varchar" MaxLength="10" Nullable="false" />
-          <Property Name="SoLuongSuDung" Type="decimal" Precision="18" Scale="2" Nullable="false" />
-          <Property Name="GhiChu" Type="nvarchar" MaxLength="255" />
         </EntityType>
         <EntityType Name="DanhMucMon">
           <Key>
@@ -166,30 +166,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_CTHD_HoaDon">
-          <End Role="HoaDon" Type="Self.HoaDon" Multiplicity="1" />
-          <End Role="ChiTietHoaDon" Type="Self.ChiTietHoaDon" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="HoaDon">
-              <PropertyRef Name="MaHoaDon" />
-            </Principal>
-            <Dependent Role="ChiTietHoaDon">
-              <PropertyRef Name="MaHoaDon" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CTHD_Mon">
-          <End Role="Mon" Type="Self.Mon" Multiplicity="1" />
-          <End Role="ChiTietHoaDon" Type="Self.ChiTietHoaDon" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Mon">
-              <PropertyRef Name="MaMon" />
-            </Principal>
-            <Dependent Role="ChiTietHoaDon">
-              <PropertyRef Name="MaMon" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_CTPN_NguyenLieu">
           <End Role="NguyenLieu" Type="Self.NguyenLieu" Multiplicity="1" />
           <End Role="ChiTietPhieuNhap" Type="Self.ChiTietPhieuNhap" Multiplicity="*" />
@@ -211,6 +187,30 @@
             </Principal>
             <Dependent Role="ChiTietPhieuNhap">
               <PropertyRef Name="MaPhieuNhap" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CTHD_HoaDon">
+          <End Role="HoaDon" Type="Self.HoaDon" Multiplicity="1" />
+          <End Role="ChiTietHoaDon" Type="Self.ChiTietHoaDon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="HoaDon">
+              <PropertyRef Name="MaHoaDon" />
+            </Principal>
+            <Dependent Role="ChiTietHoaDon">
+              <PropertyRef Name="MaHoaDon" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CTHD_Mon">
+          <End Role="Mon" Type="Self.Mon" Multiplicity="1" />
+          <End Role="ChiTietHoaDon" Type="Self.ChiTietHoaDon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Mon">
+              <PropertyRef Name="MaMon" />
+            </Principal>
+            <Dependent Role="ChiTietHoaDon">
+              <PropertyRef Name="MaMon" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -288,9 +288,9 @@
         </Association>
         <EntityContainer Name="QL_CoffeeTeaModelStoreContainer">
           <EntitySet Name="Ban" EntityType="Self.Ban" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CongThucMon" EntityType="Self.CongThucMon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChiTietHoaDon" EntityType="Self.ChiTietHoaDon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChiTietPhieuNhap" EntityType="Self.ChiTietPhieuNhap" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="CongThucMon" EntityType="Self.CongThucMon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DanhMucMon" EntityType="Self.DanhMucMon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="HoaDon" EntityType="Self.HoaDon" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Mon" EntityType="Self.Mon" Schema="dbo" store:Type="Tables" />
@@ -307,14 +307,6 @@
             <End Role="NguyenLieu" EntitySet="NguyenLieu" />
             <End Role="CongThucMon" EntitySet="CongThucMon" />
           </AssociationSet>
-          <AssociationSet Name="FK_CTHD_HoaDon" Association="Self.FK_CTHD_HoaDon">
-            <End Role="HoaDon" EntitySet="HoaDon" />
-            <End Role="ChiTietHoaDon" EntitySet="ChiTietHoaDon" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CTHD_Mon" Association="Self.FK_CTHD_Mon">
-            <End Role="Mon" EntitySet="Mon" />
-            <End Role="ChiTietHoaDon" EntitySet="ChiTietHoaDon" />
-          </AssociationSet>
           <AssociationSet Name="FK_CTPN_NguyenLieu" Association="Self.FK_CTPN_NguyenLieu">
             <End Role="NguyenLieu" EntitySet="NguyenLieu" />
             <End Role="ChiTietPhieuNhap" EntitySet="ChiTietPhieuNhap" />
@@ -322,6 +314,14 @@
           <AssociationSet Name="FK_CTPN_PhieuNhap" Association="Self.FK_CTPN_PhieuNhap">
             <End Role="PhieuNhap" EntitySet="PhieuNhap" />
             <End Role="ChiTietPhieuNhap" EntitySet="ChiTietPhieuNhap" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CTHD_HoaDon" Association="Self.FK_CTHD_HoaDon">
+            <End Role="HoaDon" EntitySet="HoaDon" />
+            <End Role="ChiTietHoaDon" EntitySet="ChiTietHoaDon" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CTHD_Mon" Association="Self.FK_CTHD_Mon">
+            <End Role="Mon" EntitySet="Mon" />
+            <End Role="ChiTietHoaDon" EntitySet="ChiTietHoaDon" />
           </AssociationSet>
           <AssociationSet Name="FK_HoaDon_Ban" Association="Self.FK_HoaDon_Ban">
             <End Role="Ban" EntitySet="Ban" />
