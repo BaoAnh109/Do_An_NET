@@ -72,6 +72,8 @@ namespace CoffeeTea.Views
                 dsThongKe dataSet = CreateReportDataSet();
                 _reportDocument.SetDataSource(dataSet);
                 _reportDocument.Database.Tables["HoaDon"].SetDataSource((DataTable)dataSet.HoaDon);
+                CompactDetailSection();
+
 
                 SetParameterIfExists("pTongDoanhThu", _reportData.TotalRevenue);
                 SetParameterIfExists("pSoHoaDon", _reportData.TotalInvoices);
@@ -79,8 +81,10 @@ namespace CoffeeTea.Views
                 SetParameterIfExists("pTuNgay", _reportData.FromDate.Date);
                 SetParameterIfExists("pDenNgay", _reportData.ToDate.Date);
 
+                ParameterFields parameterFields = CreateViewerParameterFields();
+                _viewer.ParameterFieldInfo = parameterFields;
                 _viewer.ReportSource = _reportDocument;
-                _viewer.RefreshReport();
+                _viewer.Refresh();
             }
             catch (Exception ex)
             {
@@ -95,6 +99,34 @@ namespace CoffeeTea.Views
                 Thread.CurrentThread.CurrentCulture = oldCulture;
                 Thread.CurrentThread.CurrentUICulture = oldUICulture;
             }
+        }
+
+        private void CompactDetailSection()
+        {
+            Section detailSection = _reportDocument.ReportDefinition.Sections
+                .Cast<Section>()
+                .FirstOrDefault(section => section.ReportObjects
+                    .Cast<ReportObject>()
+                    .Any(reportObject => reportObject.Name == "STT1"
+                        || reportObject.Name == "MaHD1"
+                        || reportObject.Name == "TongTien1"));
+
+            if (detailSection == null)
+            {
+                return;
+            }
+
+            foreach (ReportObject reportObject in detailSection.ReportObjects)
+            {
+                reportObject.ObjectFormat.EnableCanGrow = false;
+                reportObject.ObjectFormat.EnableKeepTogether = false;
+            }
+
+            detailSection.Height = 360;
+            detailSection.SectionFormat.EnableKeepTogether = false;
+            detailSection.SectionFormat.EnableNewPageBefore = false;
+            detailSection.SectionFormat.EnableNewPageAfter = false;
+            detailSection.SectionFormat.EnablePrintAtBottomOfPage = false;
         }
 
         private dsThongKe CreateReportDataSet()
@@ -115,6 +147,35 @@ namespace CoffeeTea.Views
             }
 
             return dataSet;
+        }
+
+        private ParameterFields CreateViewerParameterFields()
+        {
+            var parameterFields = new ParameterFields();
+
+            AddParameter(parameterFields, "pTongDoanhThu", _reportData.TotalRevenue);
+            AddParameter(parameterFields, "pSoHoaDon", _reportData.TotalInvoices);
+            AddParameter(parameterFields, "pTBHoaDon", _reportData.AveragePerInvoice);
+            AddParameter(parameterFields, "pTuNgay", _reportData.FromDate.Date);
+            AddParameter(parameterFields, "pDenNgay", _reportData.ToDate.Date);
+
+            return parameterFields;
+        }
+
+        private void AddParameter(ParameterFields parameterFields, string parameterName, object value)
+        {
+            var parameterField = new ParameterField
+            {
+                Name = parameterName
+            };
+
+            var parameterValue = new ParameterDiscreteValue
+            {
+                Value = value
+            };
+
+            parameterField.CurrentValues.Add(parameterValue);
+            parameterFields.Add(parameterField);
         }
 
         private static DateTime ParseCreatedAt(string value)
