@@ -184,11 +184,6 @@
     <Compile Include="Models\VaiTro.cs">
       <DependentUpon>QLCoffeeTeaModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Report\dsThongKe.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>dsThongKe.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Report\StatisticsReportData.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -304,17 +299,6 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="Report\dsThongKe.xsc">
-      <DependentUpon>dsThongKe.xsd</DependentUpon>
-    </None>
-    <None Include="Report\dsThongKe.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>dsThongKe.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="Report\dsThongKe.xss">
-      <DependentUpon>dsThongKe.xsd</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
