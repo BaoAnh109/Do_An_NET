@@ -1,197 +1,253 @@
 using System;
+using System.Data;
 using System.Globalization;
+using System.Linq;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Media;
-using CoffeeTea.ViewModels;
+using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
+using CrystalDecisions.Windows.Forms;
+using CoffeeTea.Report;
+using ReportInputData = CoffeeTea.ViewModels.StatisticsReportData;
+using StatisticsCrystalReport = CoffeeTea.Report.StatisticsReportData;
 
 namespace CoffeeTea.Views
 {
     public partial class StoreStatisticsReportWindow : Window
     {
-        private readonly StatisticsReportData _reportData;
-        private readonly CultureInfo _culture = CultureInfo.GetCultureInfo("vi-VN");
+        private static readonly CultureInfo VietnameseCulture = CultureInfo.GetCultureInfo("vi-VN");
 
-        public StoreStatisticsReportWindow(StatisticsReportData reportData)
+        private readonly ReportInputData _reportData;
+        private readonly CrystalReportViewer _viewer;
+        private ReportDocument _reportDocument;
+
+        public StoreStatisticsReportWindow(ReportInputData reportData)
         {
+            if (reportData == null)
+            {
+                throw new ArgumentNullException(nameof(reportData));
+            }
+
             InitializeComponent();
-            _reportData = reportData ?? throw new ArgumentNullException(nameof(reportData));
-            PeriodTextBlock.Text = $"Từ ngày {_reportData.FromDate:dd/MM/yyyy} đến ngày {_reportData.ToDate:dd/MM/yyyy}";
-            ReportViewer.Document = CreateReportDocument();
-        }
 
-        private FlowDocument CreateReportDocument()
-        {
-            var document = new FlowDocument
+            _reportData = reportData;
+            _viewer = new CrystalReportViewer
             {
-                PagePadding = new Thickness(48),
-                ColumnWidth = 700,
-                FontFamily = new FontFamily("Segoe UI"),
-                FontSize = 12,
-                Foreground = Brushes.Black
+                Dock = System.Windows.Forms.DockStyle.Fill,
+                ToolPanelView = ToolPanelViewType.None,
+                ShowLogo = false,
+                ShowGroupTreeButton = false,
+                ReuseParameterValuesOnRefresh = true
             };
 
-            document.Blocks.Add(CreateTitle("BÁO CÁO THỐNG KÊ CỬA HÀNG"));
-            document.Blocks.Add(CreateInfoParagraph($"Thời gian: {_reportData.FromDate:dd/MM/yyyy} - {_reportData.ToDate:dd/MM/yyyy}"));
-            document.Blocks.Add(CreateInfoParagraph($"Ngày lập report: {_reportData.GeneratedAt:dd/MM/yyyy HH:mm}"));
-            document.Blocks.Add(CreateSummaryTable());
-            document.Blocks.Add(CreateSectionTitle("Danh sách hóa đơn đã thanh toán"));
-            document.Blocks.Add(CreateInvoiceTable());
+            ReportHost.Child = _viewer;
+            PeriodTextBlock.Text = string.Format(
+                VietnameseCulture,
+                "Từ ngày {0:dd/MM/yyyy} đến ngày {1:dd/MM/yyyy} - {2:N0} hóa đơn",
+                _reportData.FromDate.Date,
+                _reportData.ToDate.Date,
+                _reportData.TotalInvoices);
 
-            return document;
+            Loaded += StoreStatisticsReportWindow_Loaded;
+            Closed += StoreStatisticsReportWindow_Closed;
         }
 
-        private Paragraph CreateTitle(string text)
+        private void StoreStatisticsReportWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            return new Paragraph(new Run(text))
-            {
-                FontSize = 22,
-                FontWeight = FontWeights.Bold,
-                TextAlignment = TextAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 18)
-            };
+            LoadCrystalReport();
         }
 
-        private Paragraph CreateInfoParagraph(string text)
+        private void LoadCrystalReport()
         {
-            return new Paragraph(new Run(text))
+            var oldCulture = Thread.CurrentThread.CurrentCulture;
+            var oldUICulture = Thread.CurrentThread.CurrentUICulture;
+
+            try
             {
-                FontSize = 12,
-                TextAlignment = TextAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 4)
-            };
+                Thread.CurrentThread.CurrentCulture = VietnameseCulture;
+                Thread.CurrentThread.CurrentUICulture = VietnameseCulture;
+
+                _reportDocument = new StatisticsCrystalReport();
+
+                dsThongKe dataSet = CreateReportDataSet();
+                _reportDocument.SetDataSource(dataSet);
+                _reportDocument.Database.Tables["HoaDon"].SetDataSource((DataTable)dataSet.HoaDon);
+                CompactDetailSection();
+
+
+                SetParameterIfExists("pTongDoanhThu", _reportData.TotalRevenue);
+                SetParameterIfExists("pSoHoaDon", _reportData.TotalInvoices);
+                SetParameterIfExists("pTBHoaDon", _reportData.AveragePerInvoice);
+                SetParameterIfExists("pTuNgay", _reportData.FromDate.Date);
+                SetParameterIfExists("pDenNgay", _reportData.ToDate.Date);
+
+                ParameterFields parameterFields = CreateViewerParameterFields();
+                _viewer.ParameterFieldInfo = parameterFields;
+                _viewer.ReportSource = _reportDocument;
+                _viewer.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Không thể tải báo cáo thống kê.\n\nChi tiết lỗi:\n" + ex.Message,
+                    "Lỗi Crystal Report",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = oldCulture;
+                Thread.CurrentThread.CurrentUICulture = oldUICulture;
+            }
         }
 
-        private Paragraph CreateSectionTitle(string text)
+        private void CompactDetailSection()
         {
-            return new Paragraph(new Run(text))
+            Section detailSection = _reportDocument.ReportDefinition.Sections
+                .Cast<Section>()
+                .FirstOrDefault(section => section.ReportObjects
+                    .Cast<ReportObject>()
+                    .Any(reportObject => reportObject.Name == "STT1"
+                        || reportObject.Name == "MaHD1"
+                        || reportObject.Name == "TongTien1"));
+
+            if (detailSection == null)
             {
-                FontSize = 15,
-                FontWeight = FontWeights.Bold,
-                Margin = new Thickness(0, 18, 0, 8)
-            };
-        }
-
-        private Table CreateSummaryTable()
-        {
-            var table = new Table
-            {
-                CellSpacing = 0,
-                Margin = new Thickness(0, 18, 0, 0)
-            };
-
-            table.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
-
-            var group = new TableRowGroup();
-            var header = new TableRow();
-            header.Cells.Add(CreateCell("Tổng doanh thu", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("Số hóa đơn", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("TB / hóa đơn", true, TextAlignment.Center, true));
-
-            var values = new TableRow();
-            values.Cells.Add(CreateCell(FormatMoney(_reportData.TotalRevenue), true, TextAlignment.Center));
-            values.Cells.Add(CreateCell(_reportData.TotalInvoices.ToString("N0", _culture), true, TextAlignment.Center));
-            values.Cells.Add(CreateCell(FormatMoney(_reportData.AveragePerInvoice), true, TextAlignment.Center));
-
-            group.Rows.Add(header);
-            group.Rows.Add(values);
-            table.RowGroups.Add(group);
-            return table;
-        }
-
-        private Table CreateInvoiceTable()
-        {
-            var table = new Table
-            {
-                CellSpacing = 0
-            };
-
-            table.Columns.Add(new TableColumn { Width = new GridLength(38) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(72) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(104) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(70) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(118) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(95) });
-            table.Columns.Add(new TableColumn { Width = new GridLength(96) });
-
-            var group = new TableRowGroup();
-            var header = new TableRow();
-            header.Cells.Add(CreateCell("STT", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("Mã HĐ", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("Ngày lập", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("Bàn", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("Nhân viên", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("PTTT", true, TextAlignment.Center, true));
-            header.Cells.Add(CreateCell("Tổng tiền", true, TextAlignment.Right, true));
-            group.Rows.Add(header);
-
-            foreach (var item in _reportData.Items)
-            {
-                var row = new TableRow();
-                row.Cells.Add(CreateCell(item.No.ToString(), false, TextAlignment.Center));
-                row.Cells.Add(CreateCell(item.InvoiceId, false, TextAlignment.Left));
-                row.Cells.Add(CreateCell(item.CreatedAt, false, TextAlignment.Left));
-                row.Cells.Add(CreateCell(item.TableName, false, TextAlignment.Left));
-                row.Cells.Add(CreateCell(item.StaffName, false, TextAlignment.Left));
-                row.Cells.Add(CreateCell(item.PaymentMethod, false, TextAlignment.Left));
-                row.Cells.Add(CreateCell(FormatMoney(item.TotalAmount), false, TextAlignment.Right));
-                group.Rows.Add(row);
+                return;
             }
 
-            var totalRow = new TableRow();
-            totalRow.Cells.Add(CreateCell("Tổng cộng", true, TextAlignment.Right));
-            totalRow.Cells[0].ColumnSpan = 6;
-            totalRow.Cells.Add(CreateCell(FormatMoney(_reportData.TotalRevenue), true, TextAlignment.Right));
-            group.Rows.Add(totalRow);
-
-            table.RowGroups.Add(group);
-            return table;
-        }
-
-        private TableCell CreateCell(string text, bool isBold, TextAlignment alignment, bool isHeader = false)
-        {
-            var paragraph = new Paragraph(new Run(text ?? ""))
+            foreach (ReportObject reportObject in detailSection.ReportObjects)
             {
-                Margin = new Thickness(0),
-                TextAlignment = alignment,
-                FontSize = isHeader ? 11 : 10.5
-            };
-
-            if (isBold)
-            {
-                paragraph.FontWeight = FontWeights.Bold;
+                reportObject.ObjectFormat.EnableCanGrow = false;
+                reportObject.ObjectFormat.EnableKeepTogether = false;
             }
 
-            return new TableCell(paragraph)
-            {
-                Padding = new Thickness(6, 5, 6, 5),
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(0.5),
-                Background = isHeader ? new SolidColorBrush(Color.FromRgb(234, 248, 253)) : Brushes.White
-            };
+            detailSection.Height = 360;
+            detailSection.SectionFormat.EnableKeepTogether = false;
+            detailSection.SectionFormat.EnableNewPageBefore = false;
+            detailSection.SectionFormat.EnableNewPageAfter = false;
+            detailSection.SectionFormat.EnablePrintAtBottomOfPage = false;
         }
 
-        private string FormatMoney(decimal value)
+        private dsThongKe CreateReportDataSet()
         {
-            return value.ToString("N0", _culture) + " đ";
+            var dataSet = new dsThongKe();
+
+            foreach (var item in _reportData.Items ?? Enumerable.Empty<CoffeeTea.ViewModels.StatisticsReportInvoiceItem>())
+            {
+                dataSet.HoaDon.AddHoaDonRow(
+                    item.No,
+                    Limit(item.InvoiceId, 10),
+                    ParseCreatedAt(item.CreatedAt),
+                    Limit(item.StaffName, 100),
+                    Limit(item.TableName, 50),
+                    Limit(item.PaymentMethod, 50),
+                    item.TotalAmount,
+                    Limit(item.Status, 30));
+            }
+
+            return dataSet;
+        }
+
+        private ParameterFields CreateViewerParameterFields()
+        {
+            var parameterFields = new ParameterFields();
+
+            AddParameter(parameterFields, "pTongDoanhThu", _reportData.TotalRevenue);
+            AddParameter(parameterFields, "pSoHoaDon", _reportData.TotalInvoices);
+            AddParameter(parameterFields, "pTBHoaDon", _reportData.AveragePerInvoice);
+            AddParameter(parameterFields, "pTuNgay", _reportData.FromDate.Date);
+            AddParameter(parameterFields, "pDenNgay", _reportData.ToDate.Date);
+
+            return parameterFields;
+        }
+
+        private void AddParameter(ParameterFields parameterFields, string parameterName, object value)
+        {
+            var parameterField = new ParameterField
+            {
+                Name = parameterName
+            };
+
+            var parameterValue = new ParameterDiscreteValue
+            {
+                Value = value
+            };
+
+            parameterField.CurrentValues.Add(parameterValue);
+            parameterFields.Add(parameterField);
+        }
+
+        private static DateTime ParseCreatedAt(string value)
+        {
+            DateTime result;
+            string[] formats =
+            {
+                "dd/MM/yyyy HH:mm",
+                "dd/MM/yyyy",
+                "d/M/yyyy HH:mm",
+                "d/M/yyyy"
+            };
+
+            if (DateTime.TryParseExact(value, formats, VietnameseCulture, DateTimeStyles.None, out result))
+            {
+                return result;
+            }
+
+            if (DateTime.TryParse(value, VietnameseCulture, DateTimeStyles.None, out result))
+            {
+                return result;
+            }
+
+            return DateTime.Today;
+        }
+
+        private static string Limit(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
+
+        private void SetParameterIfExists(string parameterName, object value)
+        {
+            bool exists = _reportDocument.DataDefinition.ParameterFields
+                .Cast<ParameterFieldDefinition>()
+                .Any(parameter => parameter.Name == parameterName);
+
+            if (exists)
+            {
+                _reportDocument.SetParameterValue(parameterName, value);
+            }
         }
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            var printDialog = new PrintDialog();
-            if (printDialog.ShowDialog() == true)
+            if (_viewer.ReportSource != null)
             {
-                var paginator = ((IDocumentPaginatorSource)ReportViewer.Document).DocumentPaginator;
-                printDialog.PrintDocument(paginator, "Báo cáo thống kê cửa hàng");
+                _viewer.PrintReport();
             }
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void StoreStatisticsReportWindow_Closed(object sender, EventArgs e)
+        {
+            _viewer.ReportSource = null;
+            ReportHost.Child = null;
+
+            if (_reportDocument != null)
+            {
+                _reportDocument.Close();
+                _reportDocument.Dispose();
+                _reportDocument = null;
+            }
         }
     }
 }
