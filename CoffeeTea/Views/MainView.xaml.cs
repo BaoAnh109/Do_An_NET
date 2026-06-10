@@ -21,6 +21,19 @@ namespace CoffeeTea.Views
 
         private void HandleLogout()
         {
+            MessageBoxResult result = MessageBox.Show(
+            "Bạn có chắc chắn muốn đăng xuất không?",
+            "Xác nhận đăng xuất",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question,
+            MessageBoxResult.No
+            );
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
             LoginView loginView = new LoginView();
             Application.Current.MainWindow = loginView;
             loginView.Show();

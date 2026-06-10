@@ -24,15 +24,15 @@
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="CoffeeTea"
                            Style="{StaticResource TitleTextStyle}"/>
-                <TextBlock Text="Hệ thống quản lý cửa hàng"
+                <TextBlock Text="Hệ thống quản lý cửa hàng Coffee and Tea"
                            Style="{StaticResource SectionTitleTextStyle}"
                            Margin="0,8,0,0"/>
-                <TextBlock Text="Đăng nhập để sử dụng đúng vai trò và phân quyền menu theo tài khoản nhân viên."
+                <TextBlock Text="Mời bạn đăng nhập để sử dụng"
                            Style="{StaticResource BodyTextStyle}"
                            TextWrapping="Wrap"
                            Margin="0,14,0,0"/>
 <!--Đăng nhập nhanh cho mục đỡ test, không cần nhập mật khẩu, chỉ cần click vào là đăng nhập luôn-->
-                <Border Style="{StaticResource StatusBadgeBorderStyle}"
+                <!--<Border Style="{StaticResource StatusBadgeBorderStyle}"
                         Margin="0,18,0,0"
                         HorizontalAlignment="Left">
                       <StackPanel>
@@ -66,7 +66,7 @@
                                   </Button> 
                             </StackPanel>
                     </StackPanel>
-                </Border>
+                </Border>-->
             </StackPanel>
         </Border>
 <!--    .........................................................                 -->

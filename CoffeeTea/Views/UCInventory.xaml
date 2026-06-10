@@ -164,31 +164,31 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Mã"
                                             Binding="{Binding DrinkId}"
-                                            Width="80"/>
+                                            Width="50"/>
                             <DataGridTextColumn Header="Tên món / vật tư"
                                             Binding="{Binding DrinkName}"
                                             Width="*"/>
                             <DataGridTextColumn Header="Danh mục"
                                             Binding="{Binding CategoryName}"
-                                            Width="110"/>
+                                            Width="100"/>
                             <DataGridTextColumn Header="Tồn"
                                             Binding="{Binding Quantity}"
-                                            Width="70"/>
+                                            Width="40"/>
                             <DataGridTextColumn Header="ĐVT"
                                             Binding="{Binding Unit}"
-                                            Width="65"/>
+                                            Width="40"/>
                             <DataGridTextColumn Header="Tối thiểu"
                                             Binding="{Binding MinimumQuantity}"
-                                            Width="85"/>
+                                            Width="60"/>
                             <DataGridTextColumn Header="Giá nhập"
                                             Binding="{Binding LastImportPrice, StringFormat={}{0:N0} đ}"
-                                            Width="110"/>
+                                            Width="100"/>
                             <DataGridTextColumn Header="Giá trị"
                                             Binding="{Binding TotalValue, StringFormat={}{0:N0} đ}"
-                                            Width="120"/>
+                                            Width="100"/>
                             <DataGridTextColumn Header="Trạng thái"
                                             Binding="{Binding StatusText}"
-                                            Width="100"/>
+                                            Width="50"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

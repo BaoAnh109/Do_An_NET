@@ -228,19 +228,19 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Mã NCC"
                                                 Binding="{Binding SupplierId}"
-                                                Width="90"/>
+                                                Width="60"/>
                                 <DataGridTextColumn Header="Tên nhà cung cấp"
                                                 Binding="{Binding SupplierName}"
                                                 Width="*"/>
                                 <DataGridTextColumn Header="Điện thoại"
                                                 Binding="{Binding Phone}"
-                                                Width="120"/>
+                                                Width="100"/>
                                 <DataGridTextColumn Header="Email"
                                                 Binding="{Binding Email}"
                                                 Width="170"/>
                                 <DataGridTextColumn Header="Trạng thái"
                                                 Binding="{Binding StatusText}"
-                                                Width="120"/>
+                                                Width="90"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>

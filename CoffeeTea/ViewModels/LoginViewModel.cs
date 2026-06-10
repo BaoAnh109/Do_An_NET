@@ -83,7 +83,7 @@ namespace CoffeeTea.ViewModels
 
             Authenticate(username, password);
         }
-
+        // Đăng nhập nhanh cho các tài khoản mẫu
         private void ExecuteQuickLogin(object parameter)
         {
             string userName = parameter != null ? parameter.ToString() : string.Empty;
