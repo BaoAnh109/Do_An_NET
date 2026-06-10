@@ -17,9 +17,9 @@ namespace CoffeeTea.ViewModels
 
         public decimal AveragePerInvoice { get; set; }
 
-        public IList<StatisticsReportInvoiceItem> Items { get; set; }
+        public IList<StatisticsReportInvoiceItem> Items { get; set; } //Danh sách các hóa ??n trong kho?ng th?i gian
 
-        public StatisticsReportData()
+        public StatisticsReportData() //Kh?i t?o m?c ??nh v?i ngày hi?n t?i
         {
             FromDate = DateTime.Today;
             ToDate = DateTime.Today;
@@ -27,7 +27,7 @@ namespace CoffeeTea.ViewModels
             Items = new List<StatisticsReportInvoiceItem>();
         }
 
-        public StatisticsReportData(DateTime fromDate, DateTime toDate)
+        public StatisticsReportData(DateTime fromDate, DateTime toDate) //Kh?i t?o v?i kho?ng th?i gian c? th?
             : this()
         {
             FromDate = fromDate;

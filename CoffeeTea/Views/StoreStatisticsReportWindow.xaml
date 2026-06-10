@@ -8,9 +8,11 @@
         MinWidth="760"
         MinHeight="560"
         WindowStartupLocation="CenterOwner">
+    <!-- Cần thêm reference đến WindowsFormsIntegration để sử dụng WindowsFormsHost -->
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -47,7 +49,7 @@
                 BorderBrush="{DynamicResource Brush.BorderSoft}"
                 BorderThickness="1"
                 CornerRadius="{StaticResource Radius.Medium}">
-            <wfi:WindowsFormsHost x:Name="ReportHost"/>
+            <wfi:WindowsFormsHost x:Name="ReportHost"/> <!-- Đây là nơi hiển thị windows forms -->
         </Border>
     </Grid>
 </Window>
